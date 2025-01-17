@@ -1,4 +1,3 @@
-
 .filters-header {
     background-color: #cfe3b3;
     font-size: 20px;
@@ -230,3 +229,182 @@
     background-color: #7ab030; /* Цвет фона при наведении */
     color: white; /* Цвет текста при наведении */
 }
+
+/* Стиль в модальном окне history */
+.order {
+    margin-bottom: 1rem;
+}
+
+.order__info {
+    margin-bottom: 1rem;
+}
+
+.order__number {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.order__date, .order__total {
+    font-size: 1rem;
+    color: #7ab030;
+    margin: 0;
+}
+
+.order__items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.order__items th, .order__items td {
+    padding: 8px;
+    border: 1px solid #7ab030;
+    text-align: left;
+}
+
+.order__items th {
+    background-color: #cfe3b3;
+    font-weight: bold;
+}
+
+/* размер экранов */
+@media(max-width: 1400px){
+    .filters-container {
+        max-width: 1100px; /* Изменено с 1200px на 1100px */
+    }
+
+    .filters-clients {
+        max-width: 1100px; /* Изменено с 1200px на 1100px */
+        padding: 15px; /* Изменено с 20px на 15px */
+    }
+
+    .filters-clients table {
+        font-size: 14px;
+    }
+
+    .filters-clients th,
+    .filters-clients td {
+        padding: 10px 8px;
+    }
+}
+
+@media(max-width: 992px){
+    .filters-clients table {
+        font-size: 13px;
+    }
+
+    .filters-clients th,
+    .filters-clients td {
+        padding: 8px 6px;
+    }
+
+    .filters-clients td:nth-child(7),
+    .filters-clients td:nth-child(8),
+    .filters-clients td:nth-child(9),
+    .filters-clients th:nth-child(7),
+    .filters-clients th:nth-child(8),
+    .filters-clients th:nth-child(9) {
+        min-width: 40px;
+        width: 40px;
+    }
+}
+
+@media(max-width: 768px){
+    .filters-clients table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 12px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .filters-clients {
+        padding: 10px 5px;
+        margin: 10px 5px;
+        width: calc(100% - 10px);
+    }
+
+    .filters-container {
+        padding: 0 5px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .filters-clients th,
+    .filters-clients td {
+        padding: 6px 4px;
+        min-width: 80px; /* Минимальная ширина ячеек */
+    }
+
+    /* Специальные размеры для определенных колонок */
+    .filters-clients td:first-child,
+    .filters-clients th:first-child {
+        min-width: 40px; /* ID колонка */
+    }
+
+    .filters-clients td:nth-child(2),
+    .filters-clients th:nth-child(2) {
+        min-width: 200px; /* ФИО колонка */
+    }
+
+    .filters-clients td:nth-child(3),
+    .filters-clients th:nth-child(3) {
+        min-width: 150px; /* Email колонка */
+    }
+
+    .filters-clients td:nth-child(4),
+    .filters-clients th:nth-child(4) {
+        min-width: 120px; /* Телефон колонка */
+    }
+}
+
+@media(max-width: 576px){
+    .filters-clients {
+        padding: 5px 2px;
+        margin: 5px 2px;
+        width: calc(100% - 4px);
+    }
+
+    .filters-clients table {
+        font-size: 11px;
+    }
+
+    .filters-clients th,
+    .filters-clients td {
+        padding: 4px 2px;
+    }
+
+    /* Уменьшаем минимальную ширину колонок для самых маленьких экранов */
+    .filters-clients td:first-child,
+    .filters-clients th:first-child {
+        min-width: 30px;
+    }
+
+    .filters-clients td:nth-child(2),
+    .filters-clients th:nth-child(2) {
+        min-width: 180px;
+    }
+
+    .filters-clients td:nth-child(3),
+    .filters-clients th:nth-child(3) {
+        min-width: 130px;
+    }
+
+    .filters-clients td:nth-child(4),
+    .filters-clients th:nth-child(4) {
+        min-width: 100px;
+    }
+
+    .filters-clients td:nth-child(7),
+    .filters-clients td:nth-child(8),
+    .filters-clients td:nth-child(9),
+    .filters-clients th:nth-child(7),
+    .filters-clients th:nth-child(8),
+    .filters-clients th:nth-child(9) {
+        min-width: 25px;
+        width: 25px;
+    }
+}
+
