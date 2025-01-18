@@ -1,0 +1,410 @@
+.filters-header {
+    background-color: #cfe3b3;
+    font-size: 20px;
+    color: rgb(7, 7, 7);
+    padding: 25px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filters-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.filters-header ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+}
+
+.filters-header ul li a {
+    color: rgb(3, 3, 3);
+    text-decoration: none;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.filters-header ul li a:hover {
+    color: #b2d581; /* Используем цвет из формы авторизации */
+}
+
+.filters-header__logout {
+    color: rgb(12, 12, 12);
+    text-decoration: none;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.filters-header__logout:hover {
+    color: #7ab030; /* Используем цвет из формы авторизации */
+}
+
+/* Изолированные стили для фильтров */
+.filters-filters {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.filters-filters label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.filters-filters input[type="text"],
+.filters-filters select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #b2d581;
+    border-radius: 4px;
+}
+
+/* Изолированные стили для списка клиентов */
+.filters-clients {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.clients__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.clients__title {
+    flex-grow: 1;
+    text-align: center;
+}
+
+
+
+.clients__add-button  {
+    margin-right: 8px;
+    position: sticky;
+    top: 16px;
+}
+
+
+.filters-clients table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.filters-clients th,
+.filters-clients td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.filters-clients th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.filters-clients tr:hover {
+    background-color: #f5f5f5;
+}
+
+.filters-clients i {
+    cursor: pointer;
+    color: #b2d581;
+    transition: color 0.3s ease;
+}
+
+.filters-clients i:hover {
+    color: #7ab030;
+}
+
+.clients__title{
+    font-size: 24px;
+    text-align: center;
+    margin: 16px 0;
+
+}
+/* Стили для модальной формы */ 
+.modal__form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 1rem; 
+} 
+ 
+.modal__form-group { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 0.5rem; 
+} 
+ 
+.modal__form-group label { 
+    font-size: 14px; 
+    color: #333; 
+    font-weight: 500; 
+} 
+ 
+.modal__form-group input { 
+    padding: 8px 12px; 
+    border: 1px solid #ddd; 
+    border-radius: 4px; 
+    font-size: 14px; 
+    transition: border-color 0.2s; 
+} 
+ 
+.modal__form-group input:focus { 
+    outline: none; 
+    border-color: #cfe3b3; 
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3); 
+} 
+ 
+.modal__form-actions { 
+    display: flex; 
+    gap: 1rem; 
+    justify-content: flex-end; 
+    margin-top: 1rem; 
+} 
+ 
+.modal__btn { 
+    padding: 8px 16px; 
+    border: none; 
+    border-radius: 4px; 
+    font-size: 14px; 
+    cursor: pointer; 
+    
+    transition: background-color 0.2s; 
+} 
+ 
+.modal__btn-primary { 
+    background-color: #b2d581; 
+    color: white; 
+} 
+ 
+.modal__btn-primary:hover { 
+    background-color: #b2d581; 
+} 
+ 
+.modal__btn-secondary { 
+    background-color: #b2d581; 
+    color: white; 
+} 
+ 
+.modal__btn-secondary:hover { 
+    background-color: #b2d581; 
+}
+
+.modal__container{
+    min-width: 30%;
+}
+
+
+/* Стиль для кнопок в модальном окне */
+.styled-button {
+    border: 2px solid #b2d581; /* Обводка кнопки */
+    background-color: white; /* Фоновый цвет кнопки */
+    color: #6376ff; /* Цвет текста кнопки */
+    padding: 10px 20px; /* Отступы внутри кнопки */
+    margin: 5px; /* Отступ между кнопками */
+    border-radius: 5px; /* Закругление углов кнопки */
+    transition: all 0.3s ease; /* Плавный переход при наведении */
+}
+
+.styled-button:hover {
+    background-color: #7ab030; /* Цвет фона при наведении */
+    color: white; /* Цвет текста при наведении */
+}
+
+/* Стиль в модальном окне history */
+.order {
+    margin-bottom: 1rem;
+}
+
+.order__info {
+    margin-bottom: 1rem;
+}
+
+.order__number {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.order__date, .order__total {
+    font-size: 1rem;
+    color: #7ab030;
+    margin: 0;
+}
+
+.order__items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.order__items th, .order__items td {
+    padding: 8px;
+    border: 1px solid #7ab030;
+    text-align: left;
+}
+
+.order__items th {
+    background-color: #cfe3b3;
+    font-weight: bold;
+}
+
+/* размер экранов */
+@media(max-width: 1400px){
+    .filters-container {
+        max-width: 1100px; /* Изменено с 1200px на 1100px */
+    }
+
+    .filters-clients {
+        max-width: 1100px; /* Изменено с 1200px на 1100px */
+        padding: 15px; /* Изменено с 20px на 15px */
+    }
+
+    .filters-clients table {
+        font-size: 14px;
+    }
+
+    .filters-clients th,
+    .filters-clients td {
+        padding: 10px 8px;
+    }
+}
+
+@media(max-width: 992px){
+    .filters-clients table {
+        font-size: 13px;
+    }
+
+    .filters-clients th,
+    .filters-clients td {
+        padding: 8px 6px;
+    }
+
+    .filters-clients td:nth-child(7),
+    .filters-clients td:nth-child(8),
+    .filters-clients td:nth-child(9),
+    .filters-clients th:nth-child(7),
+    .filters-clients th:nth-child(8),
+    .filters-clients th:nth-child(9) {
+        min-width: 40px;
+        width: 40px;
+    }
+}
+
+@media(max-width: 768px){
+    .filters-clients table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 12px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .filters-clients {
+        padding: 10px 5px;
+        margin: 10px 5px;
+        width: calc(100% - 10px);
+    }
+
+    .filters-container {
+        padding: 0 5px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .filters-clients th,
+    .filters-clients td {
+        padding: 6px 4px;
+        min-width: 80px; /* Минимальная ширина ячеек */
+    }
+
+    /* Специальные размеры для определенных колонок */
+    .filters-clients td:first-child,
+    .filters-clients th:first-child {
+        min-width: 40px; /* ID колонка */
+    }
+
+    .filters-clients td:nth-child(2),
+    .filters-clients th:nth-child(2) {
+        min-width: 200px; /* ФИО колонка */
+    }
+
+    .filters-clients td:nth-child(3),
+    .filters-clients th:nth-child(3) {
+        min-width: 150px; /* Email колонка */
+    }
+
+    .filters-clients td:nth-child(4),
+    .filters-clients th:nth-child(4) {
+        min-width: 120px; /* Телефон колонка */
+    }
+}
+
+@media(max-width: 576px){
+    .filters-clients {
+        padding: 5px 2px;
+        margin: 5px 2px;
+        width: calc(100% - 4px);
+    }
+
+    .filters-clients table {
+        font-size: 11px;
+    }
+
+    .filters-clients th,
+    .filters-clients td {
+        padding: 4px 2px;
+    }
+
+    /* Уменьшаем минимальную ширину колонок для самых маленьких экранов */
+    .filters-clients td:first-child,
+    .filters-clients th:first-child {
+        min-width: 30px;
+    }
+
+    .filters-clients td:nth-child(2),
+    .filters-clients th:nth-child(2) {
+        min-width: 180px;
+    }
+
+    .filters-clients td:nth-child(3),
+    .filters-clients th:nth-child(3) {
+        min-width: 130px;
+    }
+
+    .filters-clients td:nth-child(4),
+    .filters-clients th:nth-child(4) {
+        min-width: 100px;
+    }
+
+    .filters-clients td:nth-child(7),
+    .filters-clients td:nth-child(8),
+    .filters-clients td:nth-child(9),
+    .filters-clients th:nth-child(7),
+    .filters-clients th:nth-child(8),
+    .filters-clients th:nth-child(9) {
+        min-width: 25px;
+        width: 25px;
+    }
+}
+
