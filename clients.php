@@ -1,3 +1,12 @@
+<?php
+
+session_start();
+
+require_once 'modules/AuthCheck.php';
+AuthCheck('', 'login.php');
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,7 +25,7 @@
             <p>Фамилия имя отчество</p>
             <ul>
                 <li><a href="">Клиенты</a></li>
-                <li><a href="">Товары</a></li>
+                <li><a href="products.html">Товары</a></li>
                 <li><a href="">Заказы</a></li>
             </ul>
             <a class="filters-header__logout" href="">Выйти</a>
