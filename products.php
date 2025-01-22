@@ -2,7 +2,7 @@
 
 session_start();
 
-require_once 'modules/AuthCheck.php';
+require_once 'api/auth/AuthCheck.php';
 AuthCheck('', 'login.php');
 
 ?>
@@ -24,8 +24,8 @@ AuthCheck('', 'login.php');
         <div class="filters-container">
             <p>Фамилия имя отчество</p>
             <ul>
-                <li><a href="">Клиенты</a></li>
-                <li><a href="">Товары</a></li>
+                <li><a href="clients.php">Клиенты</a></li>
+                <li><a href="products.php">Товары</a></li>
                 <li><a href="">Заказы</a></li>
             </ul>
             <a class="filters-header__logout" href="">Выйти</a>
