@@ -1,5 +1,6 @@
 <?php session_start();
 
+
 if (isset($_GET['do']) && $_GET['do'] === 'logout'){
     require_once 'api/auth/LogoutUser.php';
     require_once 'api/DB.php';
@@ -28,7 +29,14 @@ AuthCheck('', 'login.php');
 <body>
     <header class="filters-header">
         <div class="filters-container">
-            <p>Фамилия имя отчество</p>
+            <p>
+                <?php
+                 require 'api/DB.php';
+                 require_once 'api/clients/AdminName.php'; 
+
+                 echo AdminName($_SESSION['token'], $DB);
+                ?>
+            </p>
             <ul>
                 <li><a href="">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
@@ -75,7 +83,18 @@ AuthCheck('', 'login.php');
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                    <?php 
+                        require 'api/DB.php';
+                        require_once ('api/clients/OutputClients.php');
+
+                        $clients = $DB->query(
+                            "SELECT * FROM clients
+                            ")->fetchAll();
+
+                        OutputClients($clients);
+                        
+                    ?>
+                        <!-- <tr>
                             <td>0</td>
                             <td>Воронова Екатерина Сегреевна</td>
                             <td>example@mail.ru</td>
@@ -85,161 +104,7 @@ AuthCheck('', 'login.php');
                             <td onclick="MicroModal.show('history-modal')"><i class="fa fa-history" aria-hidden="true"></i></td>
                             <td onclick="MicroModal.show('edit-modal')"><i class="fa fa-pencil" aria-hidden="true"></i></td>
                             <td onclick="MicroModal.show('delete-modal')" class="styled-cell"><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>0</td>
-                            <td>Воронова Екатерина Сегреевна</td>
-                            <td>example@mail.ru</td>
-                            <td>89765432164</td>
-                            <td>19.05.2004</td>
-                            <td>15.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>0</td>
-                            <td>Воронова Екатерина Сегреевна</td>
-                            <td>example@mail.ru</td>
-                            <td>89765432164</td>
-                            <td>19.05.2004</td>
-                            <td>15.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>0</td>
-                            <td>Воронова Екатерина Сегреевна</td>
-                            <td>example@mail.ru</td>
-                            <td>89765432164</td>
-                            <td>19.05.2004</td>
-                            <td>15.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>0</td>
-                            <td>Воронова Екатерина Сегреевна</td>
-                            <td>example@mail.ru</td>
-                            <td>89765432164</td>
-                            <td>19.05.2004</td>
-                            <td>15.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>0</td>
-                            <td>Воронова Екатерина Сегреевна</td>
-                            <td>example@mail.ru</td>
-                            <td>89765432164</td>
-                            <td>19.05.2004</td>
-                            <td>15.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Петров Петр Петрович</td>
-                            <td>peter@example.com</td>
-                            <td>89765432166</td>
-                            <td>21.07.1985</td>
-                            <td>17.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Петров Петр Петрович</td>
-                            <td>peter@example.com</td>
-                            <td>89765432166</td>
-                            <td>21.07.1985</td>
-                            <td>17.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Петров Петр Петрович</td>
-                            <td>peter@example.com</td>
-                            <td>89765432166</td>
-                            <td>21.07.1985</td>
-                            <td>17.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Петров Петр Петрович</td>
-                            <td>peter@example.com</td>
-                            <td>89765432166</td>
-                            <td>21.07.1985</td>
-                            <td>17.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Петров Петр Петрович</td>
-                            <td>peter@example.com</td>
-                            <td>89765432166</td>
-                            <td>21.07.1985</td>
-                            <td>17.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Петров Петр Петрович</td>
-                            <td>peter@example.com</td>
-                            <td>89765432166</td>
-                            <td>21.07.1985</td>
-                            <td>17.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Петров Петр Петрович</td>
-                            <td>peter@example.com</td>
-                            <td>89765432166</td>
-                            <td>21.07.1985</td>
-                            <td>17.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Иванов Иван Иванович</td>
-                            <td>ivan@example.com</td>
-                            <td>89765432165</td>
-                            <td>20.06.1990</td>
-                            <td>16.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Петров Петр Петрович</td>
-                            <td>peter@example.com</td>
-                            <td>89765432166</td>
-                            <td>21.07.1985</td>
-                            <td>17.01.2025</td>
-                            <td><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr>
+                        </tr> -->
                         
                     </tbody>
                 </table>
