@@ -5,9 +5,12 @@
 
 function AuthCheck($successPath = '', $errorPath = '') {
     require_once 'api/DB.php';
+    require_once 'LogoutUser.php';
 
-    if (!isset($_SESSION['token']) && $errorPath) {  
-        header("Location: " . $errorPath);  
+    if (!isset($_SESSION['token'])) {  
+        if ($errorPath){
+        header("Location: " . $errorPath);
+     } 
         return;  
     }
 
@@ -23,6 +26,7 @@ function AuthCheck($successPath = '', $errorPath = '') {
      
     //Если adminId пустой - редирект на $errorPath 
     if (empty($adminID) && $errorPath) { 
+        LogoutUser($errorPath, $DB);
         header("Location: " . $errorPath); 
        
     } 
