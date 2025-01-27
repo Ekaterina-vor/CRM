@@ -93,14 +93,11 @@
     text-align: center;
 }
 
-
-
 .clients__add-button  {
     margin-right: 8px;
     position: sticky;
     top: 16px;
 }
-
 
 .filters-clients table {
     width: 100%;
@@ -139,8 +136,8 @@
     font-size: 24px;
     text-align: center;
     margin: 16px 0;
-
 }
+
 /* Стили для модальной формы */ 
 .modal__form { 
     display: flex; 
@@ -212,7 +209,6 @@
 .modal__container{
     min-width: 30%;
 }
-
 
 /* Стиль для кнопок в модальном окне */
 .styled-button {
@@ -406,5 +402,40 @@
         min-width: 25px;
         width: 25px;
     }
+}
+
+.main__button {
+    padding: 8px 16px;
+    border: 1px solid #b2d581;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.main__button:hover {
+    background-color: #b2d581;
+    color: white;
+}
+
+.main__button--reset {
+    margin-left: 10px;
+}
+
+button[type="submit"] {
+    padding: 8px 16px;
+    border: 1px solid #b2d581;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #b2d581;
+    color: white;
 }
 

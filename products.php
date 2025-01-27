@@ -26,7 +26,7 @@ AuthCheck('', 'login.php');
             <ul>
                 <li><a href="clients.php">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
-                <li><a href="">Заказы</a></li>
+                <li><a href="orders.php">Заказы</a></li>
             </ul>
             <a class="filters-header__logout" href="">Выйти</a>
         </div>

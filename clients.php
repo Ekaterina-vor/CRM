@@ -40,7 +40,7 @@ AuthCheck('', 'login.php');
             <ul>
                 <li><a href="">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
-                <li><a href="">Заказы</a></li>
+                <li><a href="orders.php">Заказы</a></li>
             </ul>
             <a class="filters-header__logout" href="?do=logout">Выйти</a>
         </div>
@@ -48,14 +48,17 @@ AuthCheck('', 'login.php');
     <main>
         <section class="filters-filters">
             <div class="filters-container">
-                <form action="">
+                <form action="" method="GET" class="main_form" >
                     <label for="search">Поиск по имени</label>
                     <input type="text" id="search" name="search" placeholder="Александр">
                     <label for="sort">Сортировка</label>
                     <select name="sort" id="sort">
-                        <option value="0">По возрастанию</option>
-                        <option value="1">По убыванию</option>
+                    <option value="0">По умолчанию</option>
+                        <option value="1">По возрастанию</option>
+                        <option value="2">По убыванию</option>
                     </select>
+                    <button type="submit" >Поиск</button>
+                    <a href="?" class="main__button main__button--reset">Сбросить</a>
                 </form>
             </div>
         </section>
@@ -84,27 +87,13 @@ AuthCheck('', 'login.php');
                     </thead>
                     <tbody>
                     <?php 
-                        require 'api/DB.php';
-                        require_once ('api/clients/OutputClients.php');
-
-                        $clients = $DB->query(
-                            "SELECT * FROM clients
-                            ")->fetchAll();
-
-                        OutputClients($clients);
-                        
-                    ?>
-                        <!-- <tr>
-                            <td>0</td>
-                            <td>Воронова Екатерина Сегреевна</td>
-                            <td>example@mail.ru</td>
-                            <td>89765432164</td>
-                            <td>19.05.2004</td>
-                            <td>15.01.2025</td>
-                            <td onclick="MicroModal.show('history-modal')"><i class="fa fa-history" aria-hidden="true"></i></td>
-                            <td onclick="MicroModal.show('edit-modal')"><i class="fa fa-pencil" aria-hidden="true"></i></td>
-                            <td onclick="MicroModal.show('delete-modal')" class="styled-cell"><i class="fa fa-trash" aria-hidden="true"></i></td>
-                        </tr> -->
+                        require 'api/DB.php'; 
+                        require_once 'api/clients/OutputClients.php'; 
+                        require_once 'api/clients/ClientsSearch.php'; 
+                        $Clients = ClientsSearch($_GET, $DB); 
+                        OutputClients($Clients); 
+                        ?>
+                       
                         
                     </tbody>
                 </table>
@@ -122,22 +111,22 @@ AuthCheck('', 'login.php');
               <button class="modal__close" aria-label="Close modal" data-micromodal-close></button> 
             </header> 
             <main class="modal__content" id="modal-1-content"> 
-                <form class="modal__form"> 
+                <form action="api/clients/AddClients.php" method="POST" class="modal__form"> 
                     <div class="modal__form-group"> 
                         <label for="fullname">ФИО</label> 
-                        <input type="text" id="fullname" name="fullname" required> 
+                        <input type="text" id="fullname" name="fullname" > 
                     </div> 
                     <div class="modal__form-group"> 
                         <label for="email">Почта</label> 
-                        <input type="email" id="email" name="email" required> 
+                        <input type="email" id="email" name="email" > 
                     </div> 
                     <div class="modal__form-group"> 
                         <label for="phone">Телефон</label> 
-                        <input type="tel" id="phone" name="phone" required> 
+                        <input type="tel" id="phone" name="phone" > 
                     </div> 
                     <div class="modal__form-group"> 
                         <label for="birthday">День рождения</label> 
-                        <input type="date" id="birthday" name="birthday" required> 
+                        <input type="date" id="birthday" name="birthday" > 
                     </div> 
                     <div class="modal__form-actions"> 
                         <button type="submit" class="modal__btn modal__btn-primary">Создать</button> 
@@ -148,6 +137,9 @@ AuthCheck('', 'login.php');
           </div> 
         </div> 
       </div> 
+
+
+
 
       <div class="modal micromodal-slide" id="edit-modal" aria-hidden="true"> 
         <div class="modal__overlay" tabindex="-1" data-micromodal-close> 
@@ -269,6 +261,24 @@ AuthCheck('', 'login.php');
           </div> 
         </div> 
       </div> 
+
+
+      <div class="modal micromodal-slide open" id="error-modal" aria-hidden="true"> 
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close> 
+          <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title"> 
+            <header class="modal__header"> 
+              <h2 class="modal__title" id="modal-1-title"> 
+                Ощибка! 
+              </h2> 
+              <button class="modal__close" aria-label="Close modal" data-micromodal-close></button> 
+            </header> 
+            <main class="modal__content" id="modal-1-content"> 
+                <p>Текст ошибки</p>
+            </main> 
+          </div> 
+        </div> 
+      </div>
+
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script> 
     <script defer src="scripts/initClientsModal.js"></script>
