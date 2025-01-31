@@ -140,22 +140,22 @@ AuthCheck('', 'login.php');
                     <button class="modal__close" aria-label="Close modal" data-micromodal-close></button> 
                 </header> 
                 <main class="modal__content" id="modal-1-content"> 
-                    <form class="modal__form"> 
+                    <form method='POST' action="api/product/AddProduct.php" class="modal__form"> 
                         <div class="modal__form-group"> 
                             <label for="name">Название</label> 
-                            <input type="text" id="name" name="name" required> 
+                            <input type="text" id="name" name="name" > 
                         </div> 
                         <div class="modal__form-group"> 
                             <label for="description">Описание</label> 
-                            <textarea id="description" name="description" required></textarea> 
+                            <textarea id="description" name="description" ></textarea> 
                         </div> 
                         <div class="modal__form-group"> 
                             <label for="price">Цена</label> 
-                            <input type="number" id="price" name="price" required> 
+                            <input type="number" id="price" name="price" > 
                         </div> 
                         <div class="modal__form-group"> 
                             <label for="quantity">Количество</label> 
-                            <input type="number" id="quantity" name="quantity" required> 
+                            <input type="number" id="quantity" name="stock" > 
                         </div> 
                         <div class="modal__form-actions"> 
                             <button type="submit" class="modal__btn modal__btn-primary">Создать</button> 
@@ -221,6 +221,35 @@ AuthCheck('', 'login.php');
             </div> 
         </div> 
     </div> 
+
+    <div class="modal micromodal-slide 
+    <?php 
+        if(isset($_SESSION['product-errors']) && !empty($_SESSION['product-errors'])) {
+            echo 'open';
+        }
+    ?>
+    " id="error-modal" aria-hidden="true"> 
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close> 
+          <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title"> 
+            <header class="modal__header"> 
+              <h2 class="modal__title" id="modal-1-title"> 
+                Ощибка! 
+              </h2> 
+              <button class="modal__close" aria-label="Close modal" data-micromodal-close></button> 
+            </header> 
+            <main class="modal__content" id="modal-1-content"> 
+            <?php 
+                if(isset($_SESSION['product-errors'])) {
+                    echo $_SESSION['product-errors'];
+                    unset($_SESSION['product-errors']);
+                }
+            ?>
+            </main> 
+          </div> 
+        </div> 
+      </div>
+      
+
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script> 
     <script defer src="scripts/initClientsModal.js"></script>

@@ -622,3 +622,37 @@
         padding: 4px 2px;
     }
 } 
+.main__button {
+    padding: 8px 16px;
+    border: 1px solid #b2d581;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.main__button:hover {
+    background-color: #b2d581;
+    color: white;
+}
+
+.main__button--reset {
+    margin-left: 10px;
+}
+
+button[type="submit"] {
+    padding: 8px 16px;
+    border: 1px solid #b2d581;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #b2d581;
+    color: white;
+}

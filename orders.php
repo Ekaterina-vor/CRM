@@ -56,6 +56,8 @@ AuthCheck('', 'login.php');
                         <option value="0">По возрастанию</option>
                         <option value="1">По убыванию</option>
                     </select>
+                    <button type="submit" >Поиск</button>
+                    <a href="?" class="main__button main__button--reset">Сбросить</a>
                 </form>
             </div>
         </section>
@@ -82,6 +84,24 @@ AuthCheck('', 'login.php');
                         </tr>
                     </thead>
                     <tbody>
+                    <?php
+                        require 'api/DB.php'; 
+                        
+                        $orders = $DB->query(
+                            "SELECT orders.id, clients.name, orders.order_date, orders.total,
+                            GROUP_CONCAT(products.name SEPARATOR ', ') AS product_names
+                            
+                             FROM orders
+
+                             JOIN clients ON orders.client_id = clients.id
+                             JOIN order_items ON orders.id = order_items.order_id
+                             JOIN products ON order_items.product_id = products.id
+
+                             GROUP BY orders.id, clients.name, orders.order_date, orders.total;"
+                            
+                        )->fetchAll();
+                        echo json_encode($orders);
+                    ?>
                      
                     </tbody>
                 </table>
