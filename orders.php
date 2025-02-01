@@ -88,21 +88,57 @@ AuthCheck('', 'login.php');
                         require 'api/DB.php'; 
                         
                         $orders = $DB->query(
-                            "SELECT orders.id, clients.name, orders.order_date, orders.total,
-                            GROUP_CONCAT(products.name SEPARATOR ', ') AS product_names
-                            
-                             FROM orders
-
-                             JOIN clients ON orders.client_id = clients.id
-                             JOIN order_items ON orders.id = order_items.order_id
-                             JOIN products ON order_items.product_id = products.id
-
-                             GROUP BY orders.id, clients.name, orders.order_date, orders.total;"
-                            
+                            "SELECT 
+                                orders.id AS order_id, 
+                                clients.name AS name, 
+                                orders.order_date, 
+                                orders.total,
+                                GROUP_CONCAT(CONCAT(products.name, ' (', products.price, ') x ', order_items.quantity) SEPARATOR ', ') AS product_names_with_prices_and_quantities
+                            FROM 
+                                orders
+                            JOIN 
+                                clients ON orders.client_id = clients.id
+                            JOIN 
+                                order_items ON orders.id = order_items.order_id
+                            JOIN 
+                                products ON order_items.product_id = products.id
+                            GROUP BY 
+                                orders.id, 
+                                clients.name, 
+                                orders.order_date, 
+                                orders.total;"                                                  
                         )->fetchAll();
-                        echo json_encode($orders);
+
+                        foreach($orders as $order) {
+                            echo "<tr>";
+                            echo "<td>{$order['order_id']}</td>";
+                            echo "<td>{$order['name']}</td>";
+                            echo "<td>{$order['order_date']}</td>";
+                            echo "<td>{$order['total']} ₽</td>";
+                            echo "<td>{$order['product_names_with_prices_and_quantities']}</td>";
+                            echo "<td>
+                                    <button onclick=\"MicroModal.show('edit-modal'); setEditData({$order['order_id']})\" class=\"table__button table__button--edit\">
+                                        <i class=\"fa fa-pencil\" aria-hidden=\"true\"></i>
+                                    </button>
+                                </td>";
+                            echo "<td>
+                                    <button onclick=\"MicroModal.show('delete-modal'); setDeleteId({$order['order_id']})\" class=\"table__button table__button--delete\">
+                                        <i class=\"fa fa-trash\" aria-hidden=\"true\"></i>
+                                    </button>
+                                </td>";
+                            echo "<td>
+                                    <button onclick=\"window.location.href='check.php?id={$order['order_id']}'\" class=\"table__button table__button--check\">
+                                        <i class=\"fa fa-file-text-o\" aria-hidden=\"true\"></i>
+                                    </button>
+                                </td>";
+                            echo "<td>
+                                    <button onclick=\"MicroModal.show('details-modal'); showDetails({$order['order_id']})\" class=\"table__button table__button--details\">
+                                        <i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>
+                                    </button>
+                                </td>";
+                            echo "</tr>";
+                        }
                     ?>
-                     
                     </tbody>
                 </table>
             </div>
