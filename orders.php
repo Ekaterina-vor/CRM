@@ -46,15 +46,16 @@ AuthCheck('', 'login.php');
                 <form action="">
                     <label for="search">Поиск</label>
                     <input type="text" id="search" name="search" placeholder="Поиск...">
-                    <select name="filter" id="filter">
-                        <option value="client">Клиент</option>
-                        <option value="id">ИД</option>
-                        <option value="date">Дата</option>
-                        <option value="sum">Сумма</option>
+                    <select name="search_name" id="filter">
+                        <option value="clients.name">Клиент</option>
+                        <option value="orders.id">ИД</option>
+                        <option value="orders.order_date">Дата</option>
+                        <option value="orders.total">Сумма</option>
                     </select>
                     <select name="sort" id="sort">
-                        <option value="0">По возрастанию</option>
-                        <option value="1">По убыванию</option>
+                        <option value="0">По умолчанию</option>
+                        <option value="1">По возрастанию</option>
+                        <option value="2">По убыванию</option>
                     </select>
                     <button type="submit" >Поиск</button>
                     <a href="?" class="main__button main__button--reset">Сбросить</a>
@@ -86,58 +87,43 @@ AuthCheck('', 'login.php');
                     <tbody>
                     <?php
                         require 'api/DB.php'; 
-                        
-                        $orders = $DB->query(
-                            "SELECT 
-                                orders.id AS order_id, 
-                                clients.name AS name, 
-                                orders.order_date, 
-                                orders.total,
-                                GROUP_CONCAT(CONCAT(products.name, ' (', products.price, ') x ', order_items.quantity) SEPARATOR ', ') AS product_names_with_prices_and_quantities
-                            FROM 
-                                orders
-                            JOIN 
-                                clients ON orders.client_id = clients.id
-                            JOIN 
-                                order_items ON orders.id = order_items.order_id
-                            JOIN 
-                                products ON order_items.product_id = products.id
-                            GROUP BY 
-                                orders.id, 
-                                clients.name, 
-                                orders.order_date, 
-                                orders.total;"                                                  
-                        )->fetchAll();
+                        require_once 'api/order/OutputOrders.php';
+                        require_once 'api/order/OrdersSearch.php';
 
-                        foreach($orders as $order) {
-                            echo "<tr>";
-                            echo "<td>{$order['order_id']}</td>";
-                            echo "<td>{$order['name']}</td>";
-                            echo "<td>{$order['order_date']}</td>";
-                            echo "<td>{$order['total']} ₽</td>";
-                            echo "<td>{$order['product_names_with_prices_and_quantities']}</td>";
-                            echo "<td>
-                                    <button onclick=\"MicroModal.show('edit-modal'); setEditData({$order['order_id']})\" class=\"table__button table__button--edit\">
-                                        <i class=\"fa fa-pencil\" aria-hidden=\"true\"></i>
-                                    </button>
-                                </td>";
-                            echo "<td>
-                                    <button onclick=\"MicroModal.show('delete-modal'); setDeleteId({$order['order_id']})\" class=\"table__button table__button--delete\">
-                                        <i class=\"fa fa-trash\" aria-hidden=\"true\"></i>
-                                    </button>
-                                </td>";
-                            echo "<td>
-                                    <button onclick=\"window.location.href='check.php?id={$order['order_id']}'\" class=\"table__button table__button--check\">
-                                        <i class=\"fa fa-file-text-o\" aria-hidden=\"true\"></i>
-                                    </button>
-                                </td>";
-                            echo "<td>
-                                    <button onclick=\"MicroModal.show('details-modal'); showDetails({$order['order_id']})\" class=\"table__button table__button--details\">
-                                        <i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>
-                                    </button>
-                                </td>";
-                            echo "</tr>";
-                        }
+                        $orders = OrdersSearch($_GET, $DB); 
+                        OutputOrders($orders);
+                        
+                       
+
+                        // foreach($orders as $order) {
+                        //     echo "<tr>";
+                        //     echo "<td>{$order['order_id']}</td>";
+                        //     echo "<td>{$order['name']}</td>";
+                        //     echo "<td>{$order['order_date']}</td>";
+                        //     echo "<td>{$order['total']} ₽</td>";
+                        //     echo "<td>{$order['product_names_with_prices_and_quantities']}</td>";
+                        //     echo "<td>
+                        //             <button onclick=\"MicroModal.show('edit-modal'); setEditData({$order['order_id']})\" class=\"table__button table__button--edit\">
+                        //                 <i class=\"fa fa-pencil\" aria-hidden=\"true\"></i>
+                        //             </button>
+                        //         </td>";
+                        //     echo "<td>
+                        //             <button onclick=\"MicroModal.show('delete-modal'); setDeleteId({$order['order_id']})\" class=\"table__button table__button--delete\">
+                        //                 <i class=\"fa fa-trash\" aria-hidden=\"true\"></i>
+                        //             </button>
+                        //         </td>";
+                        //     echo "<td>
+                        //             <button onclick=\"window.location.href='check.php?id={$order['order_id']}'\" class=\"table__button table__button--check\">
+                        //                 <i class=\"fa fa-file-text-o\" aria-hidden=\"true\"></i>
+                        //             </button>
+                        //         </td>";
+                        //     echo "<td>
+                        //             <button onclick=\"MicroModal.show('details-modal'); showDetails({$order['order_id']})\" class=\"table__button table__button--details\">
+                        //                 <i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>
+                        //             </button>
+                        //         </td>";
+                        //     echo "</tr>";
+                        // }
                     ?>
                     </tbody>
                 </table>
@@ -154,14 +140,35 @@ AuthCheck('', 'login.php');
               <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <main class="modal__content" id="modal-1-content">
-            <form class="modal__form"> 
+            <form method="post" action="api/order/AddOrders.php" class="modal__form"> 
                     <div class="modal__form-group"> 
-                        <label for="fullname">ФИО</label> 
-                        <input type="text" id="fullname" name="fullname" required> 
+                        <label for="client">Клиент</label> 
+                        <select name="client" id="client" class="main__select">
+                            <?php   
+                                $users = $DB->query("SELECT id, name FROM clients")->fetchAll();
+                                foreach($users as $key => $user) {
+                                    $id = $user['id'];
+                                    $name = $user['name'];
+                                    echo "<option value='$id'>$name</option>";
+                                }
+                            ?>
+                        </select>
                     </div> 
                     <div class="modal__form-group"> 
-                        <label for="email">Почта</label> 
-                        <input type="email" id="email" name="email" required> 
+                        <label for="products">Товары</label> 
+                        <select name="products" id="products" class="main__select" multiple>
+                            <?php   
+                                $products = $DB->query("SELECT id, name, price, stock FROM products WHERE stock > 0")->fetchAll();
+                                foreach($products as $key => $product) {
+                                    $id = $product['id'];
+                                    $name = $product['name'];
+                                    $price = $product['price'];
+                                    $stock = $product['stock'];
+                                    echo "<option value='$id'>$name - $price ₽ - $stock шт.</option>";
+                                }
+                            ?>
+                            
+                        </select> 
                     </div> 
                     
                     <div class="modal__form-actions"> 
@@ -202,6 +209,33 @@ AuthCheck('', 'login.php');
             </div>
         </div>
     </div>
+
+    <div class="modal micromodal-slide 
+    <?php 
+        if(isset($_SESSION['orders-errors']) && !empty($_SESSION['orders-errors'])) {
+            echo 'open';
+        }
+    ?>
+    " id="error-modal" aria-hidden="true"> 
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close> 
+          <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title"> 
+            <header class="modal__header"> 
+              <h2 class="modal__title" id="modal-1-title"> 
+                Ощибка! 
+              </h2> 
+              <button class="modal__close" aria-label="Close modal" data-micromodal-close></button> 
+            </header> 
+            <main class="modal__content" id="modal-1-content"> 
+            <?php 
+                if(isset($_SESSION['orders-errors'])) {
+                    echo $_SESSION['orders-errors'];
+                    unset($_SESSION['orders-errors']);
+                }
+            ?>
+            </main> 
+          </div> 
+        </div> 
+      </div>                           
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script defer src="scripts/initOrdersModal.js"></script>
