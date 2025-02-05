@@ -156,7 +156,7 @@ AuthCheck('', 'login.php');
                     </div> 
                     <div class="modal__form-group"> 
                         <label for="products">Товары</label> 
-                        <select name="products" id="products" class="main__select" multiple>
+                        <select name="products[]" id="products" class="main__select" multiple>
                             <?php   
                                 $products = $DB->query("SELECT id, name, price, stock FROM products WHERE stock > 0")->fetchAll();
                                 foreach($products as $key => $product) {
@@ -239,5 +239,10 @@ AuthCheck('', 'login.php');
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script defer src="scripts/initOrdersModal.js"></script>
+    <script>
+    function setDeleteId(orderId) {
+        document.getElementById('delete_order_id').value = orderId;
+    }
+    </script>
 </body>
 </html>
