@@ -30,6 +30,7 @@ function OrdersSearch($params, $DB) {
     $search = isset($params['search']) ? trim($params['search']) : ''; 
     $sort = isset($params['sort']) ? $params['sort'] : '0'; 
     $search_name = isset($params['search_name']) ? $params['search_name'] : 'clients.name'; 
+    $show_inactive = isset($params['show_inactive']) && $params['show_inactive'] == '1';
     $order = ''; 
  
     $query = " 
@@ -37,8 +38,8 @@ function OrdersSearch($params, $DB) {
             orders.id as order_id, 
             clients.name, 
             orders.order_date, 
-            SUM(products.price * order_items.quantity) as total, 
             orders.status, 
+            SUM(products.price * order_items.quantity) as total, 
             GROUP_CONCAT(products.name SEPARATOR ', ') AS product_names, 
             GROUP_CONCAT(order_items.quantity SEPARATOR ', ') AS product_quantities, 
             GROUP_CONCAT(products.price SEPARATOR ', ') AS product_prices 
@@ -51,20 +52,36 @@ function OrdersSearch($params, $DB) {
         JOIN 
             products ON order_items.product_id = products.id"; 
  
-    // Добавляем WHERE условие для поиска 
+    // Базовое условие WHERE
+    $whereConditions = [];
+    
+    // По умолчанию показываем только активные заказы
+    if (!$show_inactive) {
+        $whereConditions[] = "orders.status = '1'";
+    }
+ 
+    // Добавляем условия поиска
     if (!empty($search)) { 
         switch ($search_name) { 
             case 'clients.name': 
-                $query .= " WHERE LOWER(clients.name) LIKE LOWER('%" . $search . "%')"; 
+                $whereConditions[] = "LOWER(clients.name) LIKE LOWER('%" . $search . "%')"; 
                 break; 
-            case 'orders.order_id': 
-                $query .= " WHERE orders.id = '" . $search . "'"; 
+            case 'orders.id': 
+                $whereConditions[] = "orders.id = '" . $search . "'"; 
                 break; 
             case 'orders.order_date': 
-                $query .= " WHERE DATE(orders.order_date) = '" . $search . "'"; 
+                $whereConditions[] = "DATE(orders.order_date) = '" . $search . "'"; 
+                break; 
+            case 'orders.status': 
+                $whereConditions[] = "orders.status = '" . $search . "'"; 
                 break; 
         } 
     } 
+ 
+    // Объединяем все условия WHERE
+    if (!empty($whereConditions)) {
+        $query .= " WHERE " . implode(" AND ", $whereConditions);
+    }
  
     $query .= " GROUP BY orders.id, clients.name, orders.order_date, orders.status"; 
  
@@ -73,14 +90,14 @@ function OrdersSearch($params, $DB) {
         $query .= " HAVING total = '" . $search . "'"; 
     } 
  
-    // Добавляем сортировку независимо от поиска 
+    // Добавляем сортировку
     if ($sort != '0') { 
         $orderDirection = ($sort == '1') ? 'ASC' : 'DESC'; 
         switch ($search_name) { 
             case 'clients.name': 
                 $query .= " ORDER BY clients.name " . $orderDirection; 
                 break; 
-            case 'orders.order_id': 
+            case 'orders.id': 
                 $query .= " ORDER BY orders.id " . $orderDirection; 
                 break; 
             case 'orders.order_date': 
@@ -88,6 +105,9 @@ function OrdersSearch($params, $DB) {
                 break; 
             case 'orders.total': 
                 $query .= " ORDER BY total " . $orderDirection; 
+                break; 
+            case 'orders.status': 
+                $query .= " ORDER BY orders.status " . $orderDirection; 
                 break; 
             default: 
                 $query .= " ORDER BY orders.id " . $orderDirection; 

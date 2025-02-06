@@ -43,21 +43,26 @@ AuthCheck('', 'login.php');
     <main>
         <section class="filters-filters">
             <div class="filters-container">
-                <form action="">
+                <form action="" method="GET">
                     <label for="search">Поиск</label>
-                    <input type="text" id="search" name="search" placeholder="Поиск...">
+                    <input type="text" id="search" name="search" placeholder="Поиск..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
                     <select name="search_name" id="filter">
-                        <option value="clients.name">Клиент</option>
-                        <option value="orders.id">ИД</option>
-                        <option value="orders.order_date">Дата</option>
-                        <option value="orders.total">Сумма</option>
+                        <option value="clients.name" <?php echo (isset($_GET['search_name']) && $_GET['search_name'] == 'clients.name') ? 'selected' : ''; ?>>Клиент</option>
+                        <option value="orders.id" <?php echo (isset($_GET['search_name']) && $_GET['search_name'] == 'orders.id') ? 'selected' : ''; ?>>ИД</option>
+                        <option value="orders.order_date" <?php echo (isset($_GET['search_name']) && $_GET['search_name'] == 'orders.order_date') ? 'selected' : ''; ?>>Дата</option>
+                        <option value="orders.total" <?php echo (isset($_GET['search_name']) && $_GET['search_name'] == 'orders.total') ? 'selected' : ''; ?>>Сумма</option>
+                        <option value="orders.status" <?php echo (isset($_GET['search_name']) && $_GET['search_name'] == 'orders.status') ? 'selected' : ''; ?>>Статус</option>
                     </select>
                     <select name="sort" id="sort">
-                        <option value="0">По умолчанию</option>
-                        <option value="1">По возрастанию</option>
-                        <option value="2">По убыванию</option>
+                        <option value="0" <?php echo (!isset($_GET['sort']) || $_GET['sort'] == '0') ? 'selected' : ''; ?>>По умолчанию</option>
+                        <option value="1" <?php echo (isset($_GET['sort']) && $_GET['sort'] == '1') ? 'selected' : ''; ?>>По возрастанию</option>
+                        <option value="2" <?php echo (isset($_GET['sort']) && $_GET['sort'] == '2') ? 'selected' : ''; ?>>По убыванию</option>
                     </select>
-                    <button type="submit" >Поиск</button>
+                    <div class="show-inactive">
+                        <input type="checkbox" id="show_inactive" name="show_inactive" value="1" <?php echo isset($_GET['show_inactive']) && $_GET['show_inactive'] == '1' ? 'checked' : ''; ?>>
+                        <label for="show_inactive">Показывать неактивные заказы</label>
+                    </div>
+                    <button type="submit" name="filter" value="1">Поиск</button>
                     <a href="?" class="main__button main__button--reset">Сбросить</a>
                 </form>
             </div>
@@ -76,12 +81,14 @@ AuthCheck('', 'login.php');
                             <th>ИД</th>
                             <th>ФИО клиента</th>
                             <th>Дата заказа</th>
-                            <th>Цена</th>
+                            <th>Сумма</th>
                             <th>Элементы заказа</th>
+                            <th>Статус</th>
+                            <th>Чек</th>
                             <th>Редактировать</th>
                             <th>Удалить</th>
-                            <th>Чек</th>
-                            <th>Подробнее</th>
+                            
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -239,10 +246,5 @@ AuthCheck('', 'login.php');
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script defer src="scripts/initOrdersModal.js"></script>
-    <script>
-    function setDeleteId(orderId) {
-        document.getElementById('delete_order_id').value = orderId;
-    }
-    </script>
 </body>
 </html>

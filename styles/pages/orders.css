@@ -656,3 +656,28 @@ button[type="submit"]:hover {
     background-color: #b2d581;
     color: white;
 }
+
+.show-inactive {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.status-active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.status-inactive {
+    background-color: #f44336;
+    color: white;
+}
+
+.order-inactive {
+    opacity: 0.7;
+}
