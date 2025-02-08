@@ -404,6 +404,12 @@
     }
 }
 
+
+
+.group-email input {
+    width: 100%;
+}
+
 .main__button {
     padding: 8px 16px;
     border: 1px solid #b2d581;

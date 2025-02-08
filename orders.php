@@ -9,6 +9,8 @@ if (isset($_GET['do']) && $_GET['do'] === 'logout'){
  
 require_once 'api/auth/AuthCheck.php'; 
 AuthCheck('', 'login.php'); 
+require_once 'api/helpers/InputDefaultValue.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +47,7 @@ AuthCheck('', 'login.php');
             <div class="filters-container">
                 <form action="" method="GET">
                     <label for="search">Поиск</label>
-                    <input type="text" id="search" name="search" placeholder="Поиск..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                    <input <?php InputDefaultValue('search', ''); ?> class="main__input" type="text" id="search" name="search" placeholder="Поиск...">
                     <select name="search_name" id="filter">
                         <option value="clients.name" <?php echo (isset($_GET['search_name']) && $_GET['search_name'] == 'clients.name') ? 'selected' : ''; ?>>Клиент</option>
                         <option value="orders.id" <?php echo (isset($_GET['search_name']) && $_GET['search_name'] == 'orders.id') ? 'selected' : ''; ?>>ИД</option>
@@ -151,6 +153,7 @@ AuthCheck('', 'login.php');
                     <div class="modal__form-group"> 
                         <label for="client">Клиент</label> 
                         <select name="client" id="client" class="main__select">
+                        <option value="new">Новый пользователь</option>
                             <?php   
                                 $users = $DB->query("SELECT id, name FROM clients")->fetchAll();
                                 foreach($users as $key => $user) {
@@ -161,6 +164,10 @@ AuthCheck('', 'login.php');
                             ?>
                         </select>
                     </div> 
+                    <div class="modal__form-group group-email" id="email-field">
+                        <label for="email">Почта</label>
+                        <input type="email" id="email" name="email" placeholder="Введите почту....">
+                    </div>
                     <div class="modal__form-group"> 
                         <label for="products">Товары</label> 
                         <select name="products[]" id="products" class="main__select" multiple>
@@ -246,5 +253,6 @@ AuthCheck('', 'login.php');
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script defer src="scripts/initOrdersModal.js"></script>
+    <script defer src="scripts/orders.js"></script>
 </body>
 </html>

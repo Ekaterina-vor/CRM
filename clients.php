@@ -9,14 +9,16 @@ if (isset($_GET['do']) && $_GET['do'] === 'logout'){
 } 
 
 require_once 'api/auth/AuthCheck.php';
-
+require_once 'api/helpers/InputDefaultValue.php';
 AuthCheck('', 'login.php');
+
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM | Главная</title>
@@ -49,9 +51,14 @@ AuthCheck('', 'login.php');
         <section class="filters-filters">
             <div class="filters-container">
                 <form action="" method="GET" class="main_form" >
-                    <label for="search">Поиск по имени</label>
-                    <input type="text" id="search" name="search" placeholder="Александр">
+                    
                     <label for="sort">Сортировка</label>
+                    <select class="main__select" name="search_name" id="search_name">
+                        <option value="name">Поиск по имени</option>
+                        <option value="email">Поиск по почте</option>
+                    </select>
+                    <label for="search">Поиск по имени</label>
+                    <input <?php InputDefaultValue('search', ''); ?> class="main__input" type="text" id="search" name="search" placeholder="Александр">
                     <select name="sort" id="sort">
                     <option value="0">По умолчанию</option>
                         <option value="1">По возрастанию</option>

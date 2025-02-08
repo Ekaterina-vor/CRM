@@ -24,6 +24,7 @@ function OutputOrders($clients){
                 <td>{$products_info}</td>
                 <td><span class='status-badge status-{$statusClass}'>{$statusText}</span></td>
                 <td onclick=\"MicroModal.show('history-modal')\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\"></i></td>
+                
                 <td onclick=\"MicroModal.show('edit-modal')\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></td>
                 <td>
                 <a href='api/order/DeleteOrder.php?id={$client['order_id']}'>
