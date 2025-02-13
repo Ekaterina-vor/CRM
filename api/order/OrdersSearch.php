@@ -42,11 +42,14 @@ function OrdersSearch($params, $DB) {
             SUM(products.price * order_items.quantity) as total, 
             GROUP_CONCAT(products.name SEPARATOR ', ') AS product_names, 
             GROUP_CONCAT(order_items.quantity SEPARATOR ', ') AS product_quantities, 
-            GROUP_CONCAT(products.price SEPARATOR ', ') AS product_prices 
+            GROUP_CONCAT(products.price SEPARATOR ', ') AS product_prices,
+            users.name AS admin_name 
         FROM 
             orders 
         JOIN 
             clients ON orders.client_id = clients.id 
+        JOIN
+            users ON orders.admin = users.id
         JOIN 
             order_items ON orders.id = order_items.order_id 
         JOIN 

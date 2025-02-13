@@ -58,19 +58,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 
+    $token = $_SESSION['token'];
+    $adminID = $DB->query(
+        "SELECT id FROM users WHERE token = '$token'"
+        )->fetchAll(PDO::FETCH_ASSOC)[0]['id'];
+
 
     //создание заказа с полями
     $orders = [
         'id' => time(),
         'client_id' => $clientID,
-        'total' => $total
+        'total' => $total,
+        'admin' => $adminID,
     ];
 
 
     // Добавляем заказ в таблицу orders
-    $sql = "INSERT INTO orders (id, client_id, total) VALUES (:id, :client_id, :total)";
+    $sql = "INSERT INTO orders (id, client_id, total, admin) VALUES (:id, :client_id, :total, :admin)";
     $stmt = $DB->prepare($sql);
     $stmt->execute($orders);
+    
+
 
     // Получаем ID созданного заказа
     $orderId = $DB->lastInsertId();

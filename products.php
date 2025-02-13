@@ -61,15 +61,15 @@ require_once 'api/helpers/InputDefaultValue.php';
                     
                     
                     <select name="search_name" id="sort1">
-                        <option value="name">Название</option>
-                        <option value="price">Цена</option>
-                        <option value="stock">Количество</option>
+                        <option value="name" <?php echo ($_GET['search_name'] ?? '') === 'name' ? 'selected' : ''; ?>>Название</option>
+                        <option value="price" <?php echo ($_GET['search_name'] ?? '') === 'price' ? 'selected' : ''; ?>>Цена</option>
+                        <option value="stock" <?php echo ($_GET['search_name'] ?? '') === 'stock' ? 'selected' : ''; ?>>Количество</option>
                     </select>
 
                     <select name="sort" id="sort">
-                    <option value="0">По умолчанию</option>
-                        <option value="1">По возрастанию</option>
-                        <option value="2">По убыванию</option>
+                        <option value="0" <?php echo ($_GET['sort'] ?? '') === '0' ? 'selected' : ''; ?>>По умолчанию</option>
+                        <option value="1" <?php echo ($_GET['sort'] ?? '') === '1' ? 'selected' : ''; ?>>По возрастанию</option>
+                        <option value="2" <?php echo ($_GET['sort'] ?? '') === '2' ? 'selected' : ''; ?>>По убыванию</option>
                     </select>
                     <button type="submit" >Поиск</button>
                     <a href="?" class="main__button main__button--reset">Сбросить</a>

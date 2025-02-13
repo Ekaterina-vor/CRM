@@ -85,6 +85,7 @@ require_once 'api/helpers/InputDefaultValue.php';
                             <th>Дата заказа</th>
                             <th>Сумма</th>
                             <th>Элементы заказа</th>
+                            <th>Админ</th>
                             <th>Статус</th>
                             <th>Чек</th>
                             <th>Редактировать</th>

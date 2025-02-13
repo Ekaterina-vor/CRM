@@ -1,5 +1,8 @@
 <?php
 function OutputOrders($clients){
+
+    
+
     // Перебираем каждого клиента из массива
     foreach($clients as $client){
         // Создаем строку с информацией о продуктах
@@ -22,6 +25,7 @@ function OutputOrders($clients){
                 <td>{$client['order_date']}</td>
                 <td>{$client['total']}</td>
                 <td>{$products_info}</td>
+                <td>{$client['admin_name']}</td>
                 <td><span class='status-badge status-{$statusClass}'>{$statusText}</span></td>
                 <td onclick=\"MicroModal.show('history-modal')\"><i class=\"fa fa-file-text-o\" aria-hidden=\"true\"></i></td>
                 
