@@ -1,0 +1,17 @@
+{
+    "name": "ekaterina/crm",
+    "autoload": {
+        "psr-4": {
+            "Ekaterina\\Crm\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ekaterina",
+            "email": "ekaterina-v-04@mail.ru"
+        }
+    ],
+    "require": {
+        "dompdf/dompdf": "^3.1"
+    }
+}
