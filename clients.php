@@ -71,11 +71,52 @@ AuthCheck('', 'login.php');
         </section>
         <section class="filters-clients">
             <div class="clients__header">
-                    <button onclick="MicroModal.show('add-modal')" class="clients__add-button">
-                        <i class="fa fa-plus-square" aria-hidden="true"></i>
-                    </button>
-                    <h2 class="clients__title">Список клиентов</h2>
+                <button onclick="MicroModal.show('add-modal')" class="clients__add-button">
+                    <i class="fa fa-plus-square" aria-hidden="true"></i>
+                </button>
+                
+                <?php 
+                $maxClients = 5;
+
+                // Получаем общее количество клиентов
+                $countQuery = "SELECT COUNT(*) as total FROM clients";
+                $stmt = $DB->query($countQuery);
+                $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+                // Вычисляем максимальное количество страниц
+                $maxPage = ceil($total / $maxClients);
+
+                // Получаем текущую страницу
+                $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+                // Если страница выходит за пределы, делаем редирект
+                if ($currentPage < 1 || $currentPage > $maxPage) {
+                    $correctPage = max(1, min($currentPage, $maxPage));
+                    $queryParams = $_GET;
+                    $queryParams['page'] = $correctPage;
+                    $queryString = http_build_query($queryParams);
+                    header("Location: ?" . $queryString);
+                    exit();
+                }
+                ?>
+
+                <div class="pagination">
+                    <a href="?page=<?php echo max(1, $currentPage - 1); ?><?php echo isset($_GET['search']) ? '&search=' . $_GET['search'] : ''; ?><?php echo isset($_GET['sort']) ? '&sort=' . $_GET['sort'] : ''; ?>" 
+                       class="nav-btn <?php echo $currentPage <= 1 ? 'disabled' : ''; ?>">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                    <div class="page-info">
+                        Страница <?php echo $currentPage; ?> из <?php echo $maxPage; ?>
+                    </div>
+                    <a href="?page=<?php echo min($maxPage, $currentPage + 1); ?><?php echo isset($_GET['search']) ? '&search=' . $_GET['search'] : ''; ?><?php echo isset($_GET['sort']) ? '&sort=' . $_GET['sort'] : ''; ?>" 
+                       class="nav-btn <?php echo $currentPage >= $maxPage ? 'disabled' : ''; ?>">
+                        <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                    </a>
                 </div>
+                <!-- Выводим текущую страницу -->
+                
+                <h2 class="clients__title">Список клиентов</h2>
+            </div>
             <div class="filters-container">
             
                 <table>
