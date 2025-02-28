@@ -366,6 +366,15 @@ AuthCheck('', 'login.php');
         </div> 
       </div> 
 
+      <!--
+      1.продублируй модальное окно с ошибкой
+      2. поменяй $_SESSION -> $_GET
+      3.поменяй client-errors на send-email
+      4. id на send-email-modal
+      5 в main добавьте только вывод почты
+      6. допишите сброс почты
+
+                -->
 
       <div class="modal micromodal-slide 
     <?php 
@@ -393,6 +402,32 @@ AuthCheck('', 'login.php');
           </div> 
         </div> 
       </div>
+
+      <div class="modal micromodal-slide 
+    <?php 
+        if(isset($_GET['send-email']) && !empty($_GET['send-email'])) {
+            echo 'open';
+        }
+    ?>
+    " id="send-email-modal" aria-hidden="true"> 
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close> 
+            <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title"> 
+                <header class="modal__header"> 
+                    <h2 class="modal__title" id="modal-1-title"> 
+                        Отправка письма
+                    </h2> 
+                    <button class="modal__close" aria-label="Close modal" data-micromodal-close></button> 
+                </header> 
+                <main class="modal__content" id="modal-1-content"> 
+                    <?php 
+                        if(isset($_GET['send-email']) && !empty($_GET['send-email'])) {
+                            echo $_GET['send-email']; // Выводим только почту
+                        }
+                    ?>
+                </main> 
+            </div> 
+        </div> 
+    </div>
 
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script> 

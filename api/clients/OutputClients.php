@@ -9,12 +9,25 @@ function OutputClients($clients) {
     
     // Получаем только нужный срез массива клиентов
     $pagedClients = array_slice($clients, $start, $clientsPerPage);
+
+    //написать функцию для конвертации массива вида $params = ['key => value'] в  key = value&key и т.д и т.п
+    function convertParams($arr) {
+        $params = [];
+        foreach ($arr as $key => $value) {
+            $params[] = "$key=$value";
+        }
+        return implode('&', $params);
+    }
     
     foreach ($pagedClients as $client) {
+        $copyParams = $_GET;
+        $copyParams['send-email'] = $client['email'];
+        $queryParams = convertParams($copyParams);
+
         echo "<tr>
                 <td>{$client['id']}</td>
                 <td>{$client['name']}</td>
-                <td>{$client['email']}</td>
+                <td><a href='?{$queryParams}'>{$client['email']}</a></td>
                 <td>{$client['phone']}</td>
                 <td>{$client['birthday']}</td>
                 <td>{$client['created_at']}</td>
