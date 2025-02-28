@@ -22,6 +22,52 @@ require_once 'api/helpers/InputDefaultValue.php';
     <link rel="stylesheet" href="styles/settings.css">
     <link rel="stylesheet" href="styles/pages/orders.css">
     <link rel="stylesheet" href="styles/modules/micromodal.css">
+    <style>
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .page-numbers {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 10px 0;
+    }
+
+    .page-link {
+        padding: 5px 10px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        color: #666;
+        text-decoration: none;
+        position: relative;
+        top: 30px;
+        left: -190px;
+
+    }
+
+    .page-link:hover {
+        background-color:rgb(245, 245, 245);
+        color: #333;
+    }
+
+    .page-link[href='?page=<?php echo $currentPage; ?>'] {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+        
+    }
+
+    .page-link.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    </style>
 </head>
 <body>
     <header class="filters-header">
@@ -61,8 +107,11 @@ require_once 'api/helpers/InputDefaultValue.php';
                         <option value="2" <?php echo (isset($_GET['sort']) && $_GET['sort'] == '2') ? 'selected' : ''; ?>>По убыванию</option>
                     </select>
                     <div class="show-inactive">
-                        <input type="checkbox" id="show_inactive" name="show_inactive" value="1" <?php echo isset($_GET['show_inactive']) && $_GET['show_inactive'] == '1' ? 'checked' : ''; ?>>
-                        <label for="show_inactive">Показывать неактивные заказы</label>
+                        <select name="show_inactive" id="show_inactive">
+                            <option value="0" <?php echo (!isset($_GET['show_inactive']) || $_GET['show_inactive'] == '0') ? 'selected' : ''; ?>>Все заказы</option>
+                            <option value="1" <?php echo (isset($_GET['show_inactive']) && $_GET['show_inactive'] == '1') ? 'selected' : ''; ?>>Активные</option>
+                            <option value="2" <?php echo (isset($_GET['show_inactive']) && $_GET['show_inactive'] == '2') ? 'selected' : ''; ?>>Неактивные</option>
+                        </select>
                     </div>
                     <button type="submit" name="filter" value="1">Поиск</button>
                     <a href="?" class="main__button main__button--reset">Сбросить</a>
@@ -74,6 +123,104 @@ require_once 'api/helpers/InputDefaultValue.php';
                 <button onclick="MicroModal.show('add-modal')" class="clients__add-button">
                     <i class="fa fa-plus-square" aria-hidden="true"></i>
                 </button>
+
+                <?php 
+                $maxClients = 5; // Количество записей на странице
+
+                // Получаем общее количество заказов с учетом фильтров
+                $countQuery = "SELECT COUNT(DISTINCT orders.id) as total 
+                               FROM orders 
+                               JOIN clients ON orders.client_id = clients.id
+                               JOIN order_items ON orders.id = order_items.order_id
+                               JOIN products ON order_items.product_id = products.id";
+
+                // Добавляем условия WHERE в зависимости от фильтров
+                $whereConditions = [];
+                if (isset($_GET['search']) && !empty($_GET['search'])) {
+                    $search = strtolower($_GET['search']);
+                    $whereConditions[] = "(LOWER(clients.name) LIKE '%$search%' OR LOWER(products.name) LIKE '%$search%')";
+                }
+
+                if (isset($_GET['show_inactive'])) {
+                    switch ($_GET['show_inactive']) {
+                        case '1': // Активные
+                            $whereConditions[] = "orders.status = '1'";
+                            break;
+                        case '2': // Неактивные
+                            $whereConditions[] = "orders.status = '0'";
+                            break;
+                    }
+                }
+
+                if (!empty($whereConditions)) {
+                    $countQuery .= " WHERE " . implode(" AND ", $whereConditions);
+                }
+
+                $stmt = $DB->query($countQuery);
+                $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+                // Вычисляем максимальное количество страниц
+                $maxPage = ceil($total / $maxClients);
+
+                // Получаем текущую страницу
+                $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+                // Если текущая страница больше максимальной, перенаправляем на последнюю
+                if ($currentPage > $maxPage && $maxPage > 0) {
+                    $urlParams = $_GET;
+                    $urlParams['page'] = $maxPage;
+                    $redirectUrl = '?' . http_build_query($urlParams);
+                    header("Location: $redirectUrl");
+                    exit;
+                }
+
+                // Если страница меньше 1, устанавливаем первую страницу
+                if ($currentPage < 1) {
+                    $currentPage = 1;
+                }
+
+                // Сохраняем параметры URL
+                $urlParams = [];
+                if (isset($_GET['search'])) $urlParams['search'] = $_GET['search'];
+                if (isset($_GET['sort'])) $urlParams['sort'] = $_GET['sort'];
+                if (isset($_GET['show_inactive'])) $urlParams['show_inactive'] = $_GET['show_inactive'];
+
+                // Функция для генерации URL с параметрами
+                function buildUrl($page, $params) {
+                    $url = "?page=" . $page;
+                    foreach ($params as $key => $value) {
+                        if ($key !== 'page') {
+                            $url .= "&" . $key . "=" . urlencode($value);
+                        }
+                    }
+                    return $url;
+                }
+
+                ?>
+                <div class="pagination">
+                    <a href="<?php echo buildUrl(max(1, $currentPage - 1), $urlParams); ?>" 
+                       class="nav-btn <?php echo $currentPage <= 1 ? 'disabled' : ''; ?>">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                    <div class="page-info">
+                        Страница <?php echo $currentPage; ?> из <?php echo $maxPage; ?>
+                    </div>
+                    <a href="<?php echo buildUrl($currentPage + 1, $urlParams); ?>" 
+                       class="nav-btn <?php echo $currentPage >= $maxPage ? 'disabled' : ''; ?>">
+                        <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <?php 
+                // Отображение номеров страниц только если есть записи
+                if ($maxPage > 0) {
+                    for ($i = 1; $i <= $maxPage; $i++) {
+                        $isCurrentPage = ($i == $currentPage) ? 'style="background-color:rgb(154, 197, 165); color: white; border-color:rgb(184, 186, 188);"' : '';
+                        echo "<a href='" . buildUrl($i, $urlParams) . "' class='page-link' $isCurrentPage>$i</a>";
+                    }
+                }
+                ?>
+
+
                 <h2 class="clients__title">Список заказов</h2>
             </div>
             <div class="filters-container">
@@ -105,35 +252,7 @@ require_once 'api/helpers/InputDefaultValue.php';
                         
                        
 
-                        // foreach($orders as $order) {
-                        //     echo "<tr>";
-                        //     echo "<td>{$order['order_id']}</td>";
-                        //     echo "<td>{$order['name']}</td>";
-                        //     echo "<td>{$order['order_date']}</td>";
-                        //     echo "<td>{$order['total']} ₽</td>";
-                        //     echo "<td>{$order['product_names_with_prices_and_quantities']}</td>";
-                        //     echo "<td>
-                        //             <button onclick=\"MicroModal.show('edit-modal'); setEditData({$order['order_id']})\" class=\"table__button table__button--edit\">
-                        //                 <i class=\"fa fa-pencil\" aria-hidden=\"true\"></i>
-                        //             </button>
-                        //         </td>";
-                        //     echo "<td>
-                        //             <button onclick=\"MicroModal.show('delete-modal'); setDeleteId({$order['order_id']})\" class=\"table__button table__button--delete\">
-                        //                 <i class=\"fa fa-trash\" aria-hidden=\"true\"></i>
-                        //             </button>
-                        //         </td>";
-                        //     echo "<td>
-                        //             <button onclick=\"window.location.href='check.php?id={$order['order_id']}'\" class=\"table__button table__button--check\">
-                        //                 <i class=\"fa fa-file-text-o\" aria-hidden=\"true\"></i>
-                        //             </button>
-                        //         </td>";
-                        //     echo "<td>
-                        //             <button onclick=\"MicroModal.show('details-modal'); showDetails({$order['order_id']})\" class=\"table__button table__button--details\">
-                        //                 <i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>
-                        //             </button>
-                        //         </td>";
-                        //     echo "</tr>";
-                        // }
+                       
                     ?>
                     </tbody>
                 </table>

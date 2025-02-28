@@ -27,6 +27,51 @@ AuthCheck('', 'login.php');
     <link rel="stylesheet" href="styles/pages/clients.css">
     <link rel="stylesheet" href="styles/modules/micromodal.css">
     
+    <style>
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .page-numbers {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 10px 0;
+    }
+
+    .page-link {
+        padding: 5px 10px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        color: #666;
+        text-decoration: none;
+        position: relative;
+        top: -25px;
+
+    }
+
+    .page-link:hover {
+        background-color:rgb(245, 245, 245);
+        color: #333;
+    }
+
+    .page-link[href='?page=<?php echo $currentPage; ?>'] {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+        
+    }
+
+    .page-link.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    </style>
 </head>
 <body>
     <header class="filters-header">
@@ -98,7 +143,10 @@ AuthCheck('', 'login.php');
                     header("Location: ?" . $queryString);
                     exit();
                 }
-                ?>
+
+                        
+                    ?>
+                    
 
                 <div class="pagination">
                     <a href="?page=<?php echo max(1, $currentPage - 1); ?><?php echo isset($_GET['search']) ? '&search=' . $_GET['search'] : ''; ?><?php echo isset($_GET['sort']) ? '&sort=' . $_GET['sort'] : ''; ?>" 
@@ -113,10 +161,18 @@ AuthCheck('', 'login.php');
                         <i class="fa fa-arrow-right" aria-hidden="true"></i>
                     </a>
                 </div>
-                <!-- Выводим текущую страницу -->
+                
+                
                 
                 <h2 class="clients__title">Список клиентов</h2>
             </div>
+                    <?php 
+                    for ($i = 1; $i <= $maxPage; $i++) {
+                        $isCurrentPage = ($i == $currentPage) ? 'style="background-color:rgb(154, 197, 165); color: white; border-color:rgb(184, 186, 188);"' : '';
+                        echo "<a href='?page=$i' class='page-link' $isCurrentPage>$i</a>";
+                    }
+                    ?>
+    
             <div class="filters-container">
             
                 <table>

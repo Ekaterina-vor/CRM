@@ -38,6 +38,53 @@ require_once 'api/helpers/InputDefaultValue.php';
         <link rel="stylesheet" href="styles/settings.css"> 
         <link rel="stylesheet" href="styles/pages/products.css">
         <link rel="stylesheet" href="styles/modules/micromodal.css">
+
+        <style>
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .page-numbers {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 10px 0;
+    }
+
+    .page-link {
+        padding: 5px 10px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        color: #666;
+        text-decoration: none;
+        position: relative;
+        top: 30px;
+        left: -190px;
+
+    }
+
+    .page-link:hover {
+        background-color:rgb(245, 245, 245);
+        color: #333;
+    }
+
+    .page-link[href='?page=<?php echo $currentPage; ?>'] {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+        
+    }
+
+    .page-link.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    </style>
         
     </head>
 <body>
@@ -88,6 +135,52 @@ require_once 'api/helpers/InputDefaultValue.php';
                 <button onclick="MicroModal.show('add-modal')" class="clients__add-button">
                     <i class="fa fa-plus-square" aria-hidden="true"></i>
                 </button>
+                <?php 
+                $maxClients = 5;
+
+                // Получаем общее количество клиентов
+                $countQuery = "SELECT COUNT(*) as total FROM clients";
+                $stmt = $DB->query($countQuery);
+                $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+                // Вычисляем максимальное количество страниц
+                $maxPage = ceil($total / $maxClients);
+
+                // Получаем текущую страницу
+                $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+                // Если страница выходит за пределы, делаем редирект
+                if ($currentPage < 1 || $currentPage > $maxPage) {
+                    $correctPage = max(1, min($currentPage, $maxPage));
+                    $queryParams = $_GET;
+                    $queryParams['page'] = $correctPage;
+                    $queryString = http_build_query($queryParams);
+                    header("Location: ?" . $queryString);
+                    exit();
+                }
+
+                        
+                    ?>
+                    <div class="pagination">
+                    <a href="?page=<?php echo max(1, $currentPage - 1); ?><?php echo isset($_GET['search']) ? '&search=' . $_GET['search'] : ''; ?><?php echo isset($_GET['sort']) ? '&sort=' . $_GET['sort'] : ''; ?>" 
+                       class="nav-btn <?php echo $currentPage <= 1 ? 'disabled' : ''; ?>">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                    <div class="page-info">
+                        Страница <?php echo $currentPage; ?> из <?php echo $maxPage; ?>
+                    </div>
+                    <a href="?page=<?php echo min($maxPage, $currentPage + 1); ?><?php echo isset($_GET['search']) ? '&search=' . $_GET['search'] : ''; ?><?php echo isset($_GET['sort']) ? '&sort=' . $_GET['sort'] : ''; ?>" 
+                       class="nav-btn <?php echo $currentPage >= $maxPage ? 'disabled' : ''; ?>">
+                        <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <?php 
+                    for ($i = 1; $i <= $maxPage; $i++) {
+                        $isCurrentPage = ($i == $currentPage) ? 'style="background-color:rgb(154, 197, 165); color: white; border-color:rgb(184, 186, 188);"' : '';
+                        echo "<a href='?page=$i' class='page-link' $isCurrentPage>$i</a>";
+                    }
+                    ?>
+                
                 <h2 class="clients__title">Список товаров</h2>
             </div>
             <div class="filters-container">

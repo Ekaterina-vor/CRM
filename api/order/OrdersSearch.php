@@ -32,7 +32,12 @@ function OrdersSearch($params, $DB) {
     $search_name = isset($params['search_name']) ? $params['search_name'] : 'clients.name'; 
     $show_inactive = isset($params['show_inactive']) && $params['show_inactive'] == '1';
     $order = ''; 
- 
+    
+    // Пагинация
+    $page = isset($params['page']) ? (int)$params['page'] : 1;
+    $per_page = 5;
+    $offset = ($page - 1) * $per_page;
+
     $query = " 
         SELECT 
             orders.id as order_id, 
@@ -55,33 +60,27 @@ function OrdersSearch($params, $DB) {
         JOIN 
             products ON order_items.product_id = products.id"; 
  
-    // Базовое условие WHERE
-    $whereConditions = [];
+    // Формируем условия WHERE
+    $whereConditions = array();
     
-    // По умолчанию показываем только активные заказы
-    if (!$show_inactive) {
-        $whereConditions[] = "orders.status = '1'";
+    if (!empty($search)) {
+        $whereConditions[] = "(LOWER($search_name) LIKE :search)";
+        $params_array[':search'] = "%$search%";
     }
- 
-    // Добавляем условия поиска
-    if (!empty($search)) { 
-        switch ($search_name) { 
-            case 'clients.name': 
-                $whereConditions[] = "LOWER(clients.name) LIKE LOWER('%" . $search . "%')"; 
-                break; 
-            case 'orders.id': 
-                $whereConditions[] = "orders.id = '" . $search . "'"; 
-                break; 
-            case 'orders.order_date': 
-                $whereConditions[] = "DATE(orders.order_date) = '" . $search . "'"; 
-                break; 
-            case 'orders.status': 
-                $whereConditions[] = "orders.status = '" . $search . "'"; 
-                break; 
-        } 
-    } 
- 
-    // Объединяем все условия WHERE
+
+    // Изменяем обработку статуса заказов
+    if (isset($params['show_inactive'])) {
+        switch ($params['show_inactive']) {
+            case '1': // Активные
+                $whereConditions[] = "orders.status = '1'";
+                break;
+            case '2': // Неактивные
+                $whereConditions[] = "orders.status = '0'";
+                break;
+            // case '0' или отсутствие параметра - показываем все заказы
+        }
+    }
+
     if (!empty($whereConditions)) {
         $query .= " WHERE " . implode(" AND ", $whereConditions);
     }
@@ -94,30 +93,37 @@ function OrdersSearch($params, $DB) {
     } 
  
     // Добавляем сортировку
-    if ($sort != '0') { 
-        $orderDirection = ($sort == '1') ? 'ASC' : 'DESC'; 
-        switch ($search_name) { 
-            case 'clients.name': 
-                $query .= " ORDER BY clients.name " . $orderDirection; 
-                break; 
-            case 'orders.id': 
-                $query .= " ORDER BY orders.id " . $orderDirection; 
-                break; 
-            case 'orders.order_date': 
-                $query .= " ORDER BY orders.order_date " . $orderDirection; 
-                break; 
-            case 'orders.total': 
-                $query .= " ORDER BY total " . $orderDirection; 
-                break; 
-            case 'orders.status': 
-                $query .= " ORDER BY orders.status " . $orderDirection; 
-                break; 
-            default: 
-                $query .= " ORDER BY orders.id " . $orderDirection; 
-        } 
-    } 
- 
-    return $DB->query($query)->fetchAll(); 
+    if ($sort != '0') {
+        $orderDirection = ($sort == '1') ? 'ASC' : 'DESC';
+        switch ($search_name) {
+            case 'clients.name':
+            case 'orders.id':
+            case 'orders.order_date':
+            case 'orders.total':
+            case 'orders.status':
+                $query .= " ORDER BY $search_name $orderDirection";
+                break;
+            default:
+                $query .= " ORDER BY orders.id $orderDirection";
+        }
+    }
+
+    // Добавляем пагинацию
+    $query .= " LIMIT :limit OFFSET :offset";
+    $params_array[':limit'] = $per_page;
+    $params_array[':offset'] = $offset;
+
+    // Подготавливаем и выполняем запрос
+    $query = $DB->prepare($query);
+
+    foreach($params_array as $key => &$val) {
+        $query->bindValue($key, $val, 
+            ($key === ':limit' || $key === ':offset') ? PDO::PARAM_INT : PDO::PARAM_STR
+        );
+    }
+
+    $query->execute();
+    return $query->fetchAll();
 } 
  
 ?>
