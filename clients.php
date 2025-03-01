@@ -27,51 +27,7 @@ AuthCheck('', 'login.php');
     <link rel="stylesheet" href="styles/pages/clients.css">
     <link rel="stylesheet" href="styles/modules/micromodal.css">
     
-    <style>
-    .pagination {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        margin-bottom: 10px;
-    }
-
-    .page-numbers {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin: 10px 0;
-    }
-
-    .page-link {
-        padding: 5px 10px;
-        border: 2px solid #ddd;
-        border-radius: 4px;
-        color: #666;
-        text-decoration: none;
-        position: relative;
-        top: -25px;
-
-    }
-
-    .page-link:hover {
-        background-color:rgb(245, 245, 245);
-        color: #333;
-    }
-
-    .page-link[href='?page=<?php echo $currentPage; ?>'] {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
-        
-    }
-
-    .page-link.active {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
-    }
-    </style>
+    
 </head>
 <body>
     <header class="filters-header">
@@ -366,15 +322,7 @@ AuthCheck('', 'login.php');
         </div> 
       </div> 
 
-      <!--
-      1.продублируй модальное окно с ошибкой
-      2. поменяй $_SESSION -> $_GET
-      3.поменяй client-errors на send-email
-      4. id на send-email-modal
-      5 в main добавьте только вывод почты
-      6. допишите сброс почты
-
-                -->
+   
 
       <div class="modal micromodal-slide 
     <?php 
@@ -402,7 +350,7 @@ AuthCheck('', 'login.php');
           </div> 
         </div> 
       </div>
-
+<!-- почта -->
       <div class="modal micromodal-slide 
     <?php 
         if(isset($_GET['send-email']) && !empty($_GET['send-email'])) {
@@ -421,9 +369,28 @@ AuthCheck('', 'login.php');
                 <main class="modal__content" id="modal-1-content"> 
                     <?php 
                         if(isset($_GET['send-email']) && !empty($_GET['send-email'])) {
-                            echo $_GET['send-email']; // Выводим только почту
+                            echo $_GET['send-email'];
                         }
                     ?>
+                    
+                    <form action="api/clients/SendEmail.php?email=<?php echo $_GET['send-email']; ?>" method="POST">
+                        <div class="form-group">
+                            <label for="header">Обращение:</label>
+                            <input type="text" id="header" name="header" >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="main">Основной контент:</label>
+                            <textarea id="main" name="main" ></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="footer">Футер:</label>
+                            <input type="text" id="footer" name="footer" >
+                        </div>
+                        
+                        <button type="submit">Отправить</button>
+                    </form>
                 </main> 
             </div> 
         </div> 
