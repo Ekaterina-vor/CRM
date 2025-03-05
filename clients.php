@@ -201,32 +201,62 @@ AuthCheck('', 'login.php');
 
 
 
-      <div class="modal micromodal-slide" id="edit-modal" aria-hidden="true"> 
+      <?php
+        // В начале файла, где остальные session_start
+        if(isset($_GET['edit-user'])) {
+            if(!isset($_SESSION['show_modal'])) {
+                $_SESSION['show_modal'] = true;
+            }
+            // Получаем данные пользователя
+            $userId = $_GET['edit-user'];
+            $stmt = $DB->prepare("SELECT * FROM clients WHERE id = ?");
+            $stmt->execute([$userId]);
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Отладочный вывод
+            error_log('User Data: ' . print_r($userData, true));
+            // Временный вывод данных на страницу
+            echo '<!-- Debug: ';
+            print_r($userData);
+            echo ' -->';
+        }
+      ?>
+      
+      
+
+      <div class="modal micromodal-slide 
+    <?php 
+        if(isset($_GET['edit-user']) && !empty($_GET['edit-user']) && isset($_SESSION['show_modal']) && $_SESSION['show_modal']) {
+            echo 'open';
+            unset($_SESSION['show_modal']); // Сбрасываем флаг после открытия
+        }
+    ?>
+    " id="edit-modal" aria-hidden="true"> 
         <div class="modal__overlay" tabindex="-1" data-micromodal-close> 
           <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title"> 
             <header class="modal__header"> 
               <h2 class="modal__title" id="modal-1-title"> 
                 Редактировать клиента 
               </h2> 
-              <button class="modal__close" aria-label="Close modal" data-micromodal-close></button> 
+              <button class="modal__close" aria-label="Close modal" onclick="clearUrlAndClose()" data-micromodal-close></button> 
             </header> 
             <main class="modal__content" id="modal-1-content"> 
-                <form class="modal__form"> 
+                
+                <form action="api/clients/EditClient.php?id=<?php echo $_GET['edit-user']; ?>" method="POST" class="modal__form"> 
                     <div class="modal__form-group"> 
                         <label for="fullname">ФИО</label> 
-                        <input type="text" id="fullname" name="fullname" required> 
+                        <input type="text" id="fullname" name="fullname" required value="<?php echo htmlspecialchars($userData['name'] ?? ''); ?>"> 
                     </div> 
                     <div class="modal__form-group"> 
                         <label for="email">Почта</label> 
-                        <input type="email" id="email" name="email" required> 
+                        <input type="email" id="email" name="email" required value="<?php echo htmlspecialchars($userData['email'] ?? ''); ?>"> 
                     </div> 
                     <div class="modal__form-group"> 
                         <label for="phone">Телефон</label> 
-                        <input type="tel" id="phone" name="phone" required> 
+                        <input type="tel" id="phone" name="phone" required value="<?php echo htmlspecialchars($userData['phone'] ?? ''); ?>"> 
                     </div> 
                     <div class="modal__form-actions"> 
                         <button type="submit" class="modal__btn modal__btn-primary">Редактировать</button> 
-                        <button type="button" class="modal__btn modal__btn-secondary" data-micromodal-close>Отменить</button> 
+                        <button type="button" class="modal__btn modal__btn-secondary" onclick="clearUrlAndClose()" data-micromodal-close>Отменить</button> 
                     </div> 
                 </form> 
             </main> 
@@ -399,5 +429,17 @@ AuthCheck('', 'login.php');
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script> 
     <script defer src="scripts/initClientsModal.js"></script>
+    <script>
+    function clearUrlAndClose() {
+        // Получаем текущий URL
+        let url = new URL(window.location.href);
+        // Удаляем параметр edit-user
+        url.searchParams.delete('edit-user');
+        // Обновляем URL без перезагрузки страницы
+        window.history.pushState({}, '', url);
+        // Закрываем модальное окно
+        MicroModal.close('edit-modal');
+    }
+    </script>
 </body>
 </html>

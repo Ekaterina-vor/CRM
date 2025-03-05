@@ -20,14 +20,14 @@ function OutputClients($clients) {
     }
     
     foreach ($pagedClients as $client) {
-        $copyParams = $_GET;
-        $copyParams['send-email'] = $client['email'];
-        $queryParams = convertParams($copyParams);
+        // $copyParams = $_GET;
+        // $copyParams['send-email'] = $client['email'];
+        // $queryParams = convertParams($copyParams);
 
         echo "<tr>
                 <td>{$client['id']}</td>
                 <td>{$client['name']}</td>
-                <td><a href='?{$queryParams}'>{$client['email']}</a></td>
+                <td><a href='?send-email={$client['email']}'>{$client['email']}</a></td>
                 <td>{$client['phone']}</td>
                 <td>{$client['birthday']}</td>
                 <td>{$client['created_at']}</td>
@@ -40,9 +40,11 @@ function OutputClients($clients) {
                     </form>
                 </td>
                 <td>
-                    <button onclick=\"editClient({$client['id']})\" class='btn-edit'>
+                
+                    <a href='?edit-user={$client['id']}'>
                         <i class='fa fa-pencil'></i>
-                    </button>
+                    </a>
+
                 </td>
                 <td>
                     <button onclick=\"deleteClient({$client['id']})\" class='btn-delete'>
