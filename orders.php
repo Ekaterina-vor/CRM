@@ -369,10 +369,43 @@ require_once 'api/helpers/InputDefaultValue.php';
             </main> 
           </div> 
         </div> 
-      </div>                           
+      </div>      
+      
+      <div class="modal micromodal-slide" id="edit-modal" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="modal__container" role="dialog" aria-modal="true">
+                <header class="modal__header">
+                    <h2 class="modal__title">Редактировать заказ</h2>
+                    <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+                </header>
+                <main class="modal__content">
+                    <form action="api/order/EditOrder.php" method="POST" class="modal__form">
+                        <input type="hidden" name="id" id="edit-id">
+                        <div class="modal__form-group">
+                            <label for="status">Статус</label>
+                            <select name="status" id="edit-status">
+                                <option value="1">Активный</option>
+                                <option value="0">Неактивный</option>
+                            </select>
+                        </div>
+                        <div class="modal__form-actions">
+                            <button type="submit" class="modal__btn modal__btn-primary">Сохранить</button>
+                            <button type="button" class="modal__btn" data-micromodal-close>Отменить</button>
+                        </div>
+                    </form>
+                </main>
+            </div>
+        </div>
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script defer src="scripts/initOrdersModal.js"></script>
     <script defer src="scripts/orders.js"></script>
+    <script>
+    function editOrder(id, status) {
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-status').value = status;
+        MicroModal.show('edit-modal');
+    }
+    </script>
 </body>
 </html>

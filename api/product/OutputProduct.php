@@ -8,20 +8,19 @@ function OutputProduct($clients){
                 <td>{$client['description']}</td>
                 <td>{$client['price']}</td>
                 <td>{$client['stock']}</td>
-                  
-                <td onclick=\"MicroModal.show('edit-modal')\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></td>
-              
+                <td onclick=\"editProduct({$client['id']}, '" . htmlspecialchars($client['name'], ENT_QUOTES) . "', '" . htmlspecialchars($client['description'], ENT_QUOTES) . "', {$client['price']}, {$client['stock']})\">
+                    <i class='fa fa-pencil' aria-hidden='true'></i>
+                </td>
                 <td>
-                <a href='api/product/DeleteProduct.php?id={$client['id']}'>
-                <i class='fa fa-trash' aria-hidden='true'></i>
-                </a>
+                    <a href='api/product/DeleteProduct.php?id={$client['id']}'>
+                        <i class='fa fa-trash' aria-hidden='true'></i>
+                    </a>
                 </td>
                 <td>
                     <a href='api/product/generateQR.php?id={$client['id']}'>
                         <i class='fa fa-qrcode' aria-hidden='true'></i>
                     </a>
                 </td>
-
             </tr>";
     }
 }

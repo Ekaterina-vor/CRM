@@ -222,7 +222,7 @@ AuthCheck('', 'login.php');
       ?>
       
       
-
+        
       <div class="modal micromodal-slide 
     <?php 
         if(isset($_GET['edit-user']) && !empty($_GET['edit-user']) && isset($_SESSION['show_modal']) && $_SESSION['show_modal']) {
@@ -241,7 +241,8 @@ AuthCheck('', 'login.php');
             </header> 
             <main class="modal__content" id="modal-1-content"> 
                 
-                <form action="api/clients/EditClient.php?id=<?php echo $_GET['edit-user']; ?>" method="POST" class="modal__form"> 
+                <form action="api/clients/EditClients.php" method="POST" class="modal__form"> 
+                    <input type="hidden" name="id" value="<?php echo $_GET['edit-user']; ?>">
                     <div class="modal__form-group"> 
                         <label for="fullname">ФИО</label> 
                         <input type="text" id="fullname" name="fullname" required value="<?php echo htmlspecialchars($userData['name'] ?? ''); ?>"> 

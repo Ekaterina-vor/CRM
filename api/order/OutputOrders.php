@@ -32,7 +32,7 @@ function OutputOrders($clients){
                         <i class='fa fa-file-text-o' aria-hidden='true'></i>
                     </a>
                 </td>
-                <td onclick=\"MicroModal.show('edit-modal')\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></td>
+                <td onclick=\"editOrder({$client['order_id']}, '{$client['status']}')\"><i class='fa fa-pencil' aria-hidden='true'></i></td>
                 <td>
                 <a href='api/order/DeleteOrder.php?id={$client['order_id']}'>
                 <i class='fa fa-trash' aria-hidden='true'></i>
