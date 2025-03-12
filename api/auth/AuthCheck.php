@@ -3,13 +3,13 @@
 
 
 
-function AuthCheck($successPath = '', $errorPath = '') {
+function AuthCheck($redirect_success = '', $redirect_error = 'login.php', $DB = null) {
     require_once 'api/DB.php';
     require_once 'LogoutUser.php';
 
     if (!isset($_SESSION['token'])) {  
-        if ($errorPath){
-        header("Location: " . $errorPath);
+        if ($redirect_error){
+        header("Location: " . $redirect_error);
      } 
         return;  
     }
@@ -24,15 +24,15 @@ function AuthCheck($successPath = '', $errorPath = '') {
 
 
      
-    //Если adminId пустой - редирект на $errorPath 
-    if (empty($adminID) && $errorPath) { 
-        LogoutUser($errorPath, $DB);
-        header("Location: " . $errorPath); 
+    //Если adminId пустой - редирект на $redirect_error 
+    if (empty($adminID) && $redirect_error) { 
+        LogoutUser($redirect_error, $DB);
+        header("Location: " . $redirect_error); 
        
     } 
-    //Если adminId не пустой - редирект на $successPath 
-    if (!empty($adminID) && $successPath) { 
-        header("Location: " . $successPath); 
+    //Если adminId не пустой - редирект на $redirect_success 
+    if (!empty($adminID) && $redirect_success) { 
+        header("Location: " . $redirect_success); 
        
     }  
  

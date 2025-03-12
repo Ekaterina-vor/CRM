@@ -19,3 +19,12 @@ document.querySelectorAll('.open').forEach((modal)=>{
         });
 })
 
+const createWindow = document.querySelector('.support-create-tickets');
+document.querySelector('.support-btn').addEventListener('click', () => {
+    createWindow.style.display = 'block';
+});
+document.querySelector('.cancel-button').addEventListener('click', () => {
+    createWindow.style.display = 'none';
+});
+
+
