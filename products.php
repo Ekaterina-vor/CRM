@@ -102,8 +102,15 @@ require_once 'api/helpers/InputDefaultValue.php';
                 <li><a href="clients.php">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
                 <li><a href="orders.php">Заказы</a></li>
+                <?php
+                    require_once 'api/helpers/getUserType.php';
+                    $userType = getUserType($DB);
+                    if ($userType === 'tech') {
+                        echo '<li><a href="tech.php">Обращение пользователя</a></li>';
+                    }
+                ?>
             </ul>
-            <a class="filters-header__logout" href="">Выйти</a>
+            <a class="filters-header__logout" href="?do=logout">Выйти</a>
         </div>
     </header>
     <main>
@@ -336,6 +343,28 @@ require_once 'api/helpers/InputDefaultValue.php';
         </div> 
       </div>
       
+      <!-- Создание тикета -->
+    <button class="support-btn">
+        <i class="fa fa-question-circle fa-3x" aria-hidden="true"></i>
+    </button>
+    <div style="display: none;" class="support-create-tickets">
+        <form action="api/tickets/CreateTickets.php" method="POST" enctype="multipart/form-data">
+            <label for="type">Тип обращения</label>
+            <select name="support-type" id="type">
+                <option value="tech">Техническая поддержка</option>
+                <option value="crm">Проблема с crm</option>
+            </select>
+            <label for="message">Текст сообщения</label>
+            <textarea name="support-message" id="message"></textarea>
+            <input type="file" name="files" id="files">
+            <div class="support-tickets-buttons">
+                <button type="submit">Создать тикет</button>
+                <button type="button" class="cancel-button">Отмена</button>
+            </div>
+        </form>
+    </div>
+
+      
 
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script> 
@@ -348,6 +377,18 @@ require_once 'api/helpers/InputDefaultValue.php';
         document.getElementById('edit-price').value = price;
         document.getElementById('edit-quantity').value = quantity;
         MicroModal.show('edit-modal');
+    }
+    </script>
+    <script>
+    function clearUrlAndClose() {
+        // Получаем текущий URL
+        let url = new URL(window.location.href);
+        // Удаляем параметр edit-user
+        url.searchParams.delete('edit-user');
+        // Обновляем URL без перезагрузки страницы
+        window.history.pushState({}, '', url);
+        // Закрываем модальное окно
+        MicroModal.close('edit-modal');
     }
     </script>
 </body>

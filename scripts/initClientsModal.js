@@ -19,12 +19,23 @@ document.querySelectorAll('.open').forEach((modal)=>{
         });
 })
 
-const createWindow = document.querySelector('.support-create-tickets');
-document.querySelector('.support-btn').addEventListener('click', () => {
-    createWindow.style.display = 'block';
-});
-document.querySelector('.cancel-button').addEventListener('click', () => {
-    createWindow.style.display = 'none';
+// Код для модального окна тикета
+document.addEventListener('DOMContentLoaded', function() {
+    const supportBtn = document.querySelector('.support-btn');
+    const createWindow = document.querySelector('.support-create-tickets');
+    const cancelButton = document.querySelector('.cancel-button');
+    
+    if (supportBtn && createWindow) {
+        supportBtn.addEventListener('click', () => {
+            createWindow.style.display = 'block';
+        });
+    }
+    
+    if (cancelButton && createWindow) {
+        cancelButton.addEventListener('click', () => {
+            createWindow.style.display = 'none';
+        });
+    }
 });
 
 

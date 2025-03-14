@@ -84,6 +84,13 @@ require_once 'api/helpers/InputDefaultValue.php';
                 <li><a href="clients.php">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
                 <li><a href="orders.php">Заказы</a></li>
+                <?php
+                    require_once 'api/helpers/getUserType.php';
+                    $userType = getUserType($DB);
+                    if ($userType === 'tech') {
+                        echo '<li><a href="tech.php">Обращение пользователя</a></li>';
+                    }
+                ?>
             </ul>
             <a class="filters-header__logout" href="?do=logout">Выйти</a>
         </div>
@@ -396,6 +403,7 @@ require_once 'api/helpers/InputDefaultValue.php';
                 </main>
             </div>
         </div>
+    </div>
 
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script defer src="scripts/initOrdersModal.js"></script>
@@ -406,6 +414,43 @@ require_once 'api/helpers/InputDefaultValue.php';
         document.getElementById('edit-status').value = status;
         MicroModal.show('edit-modal');
     }
+    </script>
+     <script>
+    function clearUrlAndClose() {
+        let url = new URL(window.location.href);
+        url.searchParams.delete('edit-user');
+        window.history.pushState({}, '', url);
+        MicroModal.close('edit-modal');
+    }
+    </script>
+
+    <!-- Создание тикета -->
+    <button class="support-btn">
+        <i class="fa fa-question-circle fa-3x" aria-hidden="true"></i>
+    </button>
+    <div class="support-create-ticket">
+        <form action="api/tickets/CreateTickets.php" method="POST" enctype="multipart/form-data">
+            <label for="type">Тип обращения</label>
+            <select name="support-type" id="type" class="support-select">
+                <option value="tech">Техническая поддержка</option>
+                <option value="crm">Проблема с crm</option>
+            </select>
+            <label for="message">Текст сообщения</label>
+            <textarea name="support-message" id="message"></textarea>
+            <input type="file" name="files" id="files">
+            <button type="submit" class="support-submit">Создать тикет</button>
+        </form>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const supportBtn = document.querySelector('.support-btn');
+        const supportForm = document.querySelector('.support-create-ticket');
+        
+        supportBtn.addEventListener('click', function() {
+            supportForm.classList.toggle('active');
+        });
+    });
     </script>
 </body>
 </html>

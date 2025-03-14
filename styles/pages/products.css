@@ -442,3 +442,119 @@ button[type="submit"]:hover {
     background-color: #b2d581;
     color: white;
 }
+
+/* Стили для кнопки поддержки и модального окна тикета */
+.support-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #b2d581;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.support-btn:hover {
+    background-color: #7ab030;
+    transform: scale(1.1);
+}
+
+.support-btn i {
+    color: white;
+}
+
+.support-create-tickets {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 999;
+}
+
+.support-create-tickets form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.support-create-tickets label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.support-create-tickets select,
+.support-create-tickets textarea {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.support-create-tickets textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.support-create-tickets input[type="file"] {
+    margin: 10px 0;
+}
+
+.support-tickets-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.support-create-tickets button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.support-create-tickets button[type="submit"] {
+    background-color: #b2d581;
+    color: white;
+}
+
+.support-create-tickets button[type="submit"]:hover {
+    background-color: #7ab030;
+}
+
+.support-create-tickets .cancel-button {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.support-create-tickets .cancel-button:hover {
+    background-color: #e0e0e0;
+}
+
+@media (max-width: 576px) {
+    .support-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    .support-create-tickets {
+        width: 90%;
+        right: 5%;
+        left: 5%;
+    }
+}

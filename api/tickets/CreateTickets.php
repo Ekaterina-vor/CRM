@@ -1,107 +1,127 @@
 <?php
- session_start();
- 
- // Добавить запись обращения в БД
- // client = id текущего пользователя
- // admin = пустое значение
- 
- // Включаем вывод ошибок для отладки
- ini_set('display_errors', 1);
- ini_set('display_startup_errors', 1);
- error_reporting(E_ALL);
- 
- // Подключаемся к базе данных
- require_once '../DB.php';
- 
- // Выводим информацию о POST-данных для отладки
- echo "POST данные: ";
- var_dump($_POST);
- 
- // Получаем данные из формы
- $type = $_POST['support-type'] ?? '';
- $message = $_POST['support-message'] ?? '';
- 
- // Определяем ID клиента
- // Если пользователь авторизован, берем ID из сессии, иначе используем значение по умолчанию (например, 1)
- $client_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
- 
- echo "Тип: " . $type . "<br>";
- echo "Сообщение: " . $message . "<br>";
- echo "ID клиента: " . $client_id . "<br>";
- 
- // Проверяем, что все необходимые данные получены
- if (empty($message)) {
-     echo "Ошибка: Пустое сообщение";
-     exit;
- }
- 
- // Загрузка файла, если он был прикреплен
- $file_path = null;
- if (isset($_FILES['files']) && $_FILES['files']['error'] == 0) {
-     $upload_dir = '../../uploads/tickets/';
-     
-     // Создаем директорию, если она не существует
-     if (!file_exists($upload_dir)) {
-         mkdir($upload_dir, 0777, true);
-     }
-     
-     $file_name = time() . '_' . $_FILES['files']['name'];
-     $file_path = $upload_dir . $file_name;
-     
-     // Перемещаем загруженный файл
-     move_uploaded_file($_FILES['files']['tmp_name'], $file_path);
-     
-     // Сохраняем только относительный путь в БД
-     $file_path = 'uploads/tickets/' . $file_name;
- }
- 
- try {
-     // Проверяем, существует ли таблица tickets
-     $checkTable = $DB->query("SHOW TABLES LIKE 'tickets'");
-     if ($checkTable->rowCount() == 0) {
-         // Создаем таблицу только если она не существует
-         $DB->exec("
-             CREATE TABLE tickets (
-                 id INT AUTO_INCREMENT PRIMARY KEY,
-                 type VARCHAR(255) NOT NULL,
-                 message TEXT NOT NULL,
-                 client_id INT NOT NULL,
-                 admin INT,
-                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-             )
-         ");
-         echo "Таблица tickets создана<br>";
-     }
-     
-     // Подготавливаем и выполняем запрос на добавление тикета
-     $query = "INSERT INTO tickets (type, message, client_id, admin) VALUES (:type, :message, :client_id, :admin)";
-     
-     $stmt = $DB->prepare($query);
-     
-     $params = [
-         ':type' => $type,
-         ':message' => $message,
-         ':client_id' => $client_id,
-         ':admin' => 1
-     ];
-     
-     $result = $stmt->execute($params);
-     
-     if ($result) {
-         $lastId = $DB->lastInsertId();
-         
-         header('Location: ../../clients.php?success=ticket_created');
-         exit;
-     } else {
-         echo "Ошибка при выполнении запроса. Информация:";
-         print_r($stmt->errorInfo());
-     }
- } catch (PDOException $e) {
-     echo "Ошибка PDO: " . $e->getMessage();
-     echo "<br>Код ошибки: " . $e->getCode();
-     exit;
- } catch (Exception $e) {
-     echo "Общая ошибка: " . $e->getMessage();
-     exit;
- }
- ?>
+session_start();
+
+// Добавить запись обращения в БД
+// client = id текущего пользователя
+// admin = пустое значение
+
+// Включаем вывод ошибок для отладки
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Подключаемся к базе данных
+require_once '../DB.php';
+
+// Логируем входящие данные
+error_log("POST data: " . print_r($_POST, true));
+error_log("Session token: " . $_SESSION['token']);
+
+// Получаем данные из формы
+$type = $_POST['support-type'] ?? '';
+$message = $_POST['support-message'] ?? '';
+
+// Проверяем обязательные поля
+if (empty($message) || empty($type)) {
+    $_SESSION['tickets-error'] = "Заполните все обязательные поля";
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    exit;
+}
+
+// Получаем ID пользователя из сессии
+try {
+    $stmt = $DB->prepare("SELECT id, type FROM users WHERE token = ?");
+    $stmt->execute([$_SESSION['token']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    $admin_id = $user['id'] ?? 0;
+    error_log("Found admin ID: " . $admin_id);
+    
+    if ($admin_id === 0) {
+        throw new Exception("Не удалось определить ID пользователя");
+    }
+} catch (Exception $e) {
+    error_log("Error getting user ID: " . $e->getMessage());
+    $_SESSION['tickets-error'] = "Ошибка: " . $e->getMessage();
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    exit;
+}
+
+// Обработка загруженного файла
+$file_path = null;
+if (isset($_FILES['files']) && $_FILES['files']['error'] != UPLOAD_ERR_NO_FILE) {
+    $upload_dir = '../../uploads/tickets/';
+    
+    if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+    }
+
+    $file = $_FILES['files'];
+    if ($file['error'] == UPLOAD_ERR_OK) {
+        $tmp_name = $file['tmp_name'];
+        $name = $file['name'];
+        $file_name = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $name);
+        $server_path = $upload_dir . $file_name;
+        
+        if (move_uploaded_file($tmp_name, $server_path)) {
+            $file_path = 'uploads/tickets/' . $file_name;
+            error_log("File uploaded successfully: " . $file_path);
+        } else {
+            error_log("Failed to move uploaded file");
+        }
+    }
+}
+
+try {
+    // Проверяем существование таблицы tickets
+    $checkTable = $DB->query("SHOW TABLES LIKE 'tickets'");
+    if ($checkTable->rowCount() == 0) {
+        $DB->exec("
+            CREATE TABLE tickets (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                type VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                clients INT NOT NULL,
+                admin INT,
+                status VARCHAR(50) DEFAULT 'waiting',
+                file_path TEXT DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ");
+        error_log("Created tickets table");
+    }
+    
+    // Сохраняем тикет
+    $query = "INSERT INTO tickets (type, message, clients, admin, status, file_path) 
+              VALUES (:type, :message, :clients, :admin, :status, :file_path)";
+    
+    $params = [
+        ':type' => $type,
+        ':message' => $message,
+        ':clients' => $admin_id, // ID авторизованного пользователя
+        ':admin' => $admin_id,   // Тот же ID в поле admin
+        ':status' => 'waiting',
+        ':file_path' => $file_path
+    ];
+    
+    error_log("Executing query with params: " . print_r($params, true));
+    
+    $stmt = $DB->prepare($query);
+    $result = $stmt->execute($params);
+    
+    if ($result) {
+        error_log("Ticket saved successfully");
+        header('Location: ' . $_SERVER['HTTP_REFERER'] . '?success=ticket_created');
+        exit;
+    } else {
+        $error = $stmt->errorInfo();
+        error_log("Database error: " . print_r($error, true));
+        throw new Exception("Ошибка при сохранении тикета: " . $error[2]);
+    }
+} catch (Exception $e) {
+    error_log("Error saving ticket: " . $e->getMessage());
+    $_SESSION['tickets-error'] = "Ошибка: " . $e->getMessage();
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    exit;
+}
+?>

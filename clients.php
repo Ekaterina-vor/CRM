@@ -25,8 +25,8 @@ AuthCheck('', 'login.php');
     <link rel="stylesheet" href="styles/modules/font-awesome-4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="styles/settings.css"> 
     <link rel="stylesheet" href="styles/pages/clients.css">
+    <link rel="stylesheet" href="styles/pages/orders.css">
     <link rel="stylesheet" href="styles/modules/micromodal.css">
-    
     
 </head>
 <body>
@@ -433,7 +433,7 @@ AuthCheck('', 'login.php');
             </div> 
         </div> 
     </div>
-
+<!-- Создание тикета -->
     <button class="support-btn">
         <i class="fa fa-question-circle fa-3x" aria-hidden="true"></i>
     </button>
