@@ -429,6 +429,14 @@ require_once 'api/helpers/InputDefaultValue.php';
         <i class="fa fa-question-circle fa-3x" aria-hidden="true"></i>
     </button>
     <div class="support-create-ticket">
+        <div class="support-buttons">
+            <button type="button" class="view-tickets-btn" onclick="MicroModal.show('my-tickets-modal')">
+                <i class="fa fa-list" aria-hidden="true"></i> Мои обращения
+            </button>
+            <button type="button" class="close-btn" onclick="closeTicketForm()">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
         <form action="api/tickets/CreateTickets.php" method="POST" enctype="multipart/form-data">
             <label for="type">Тип обращения</label>
             <select name="support-type" id="type" class="support-select">
@@ -442,6 +450,91 @@ require_once 'api/helpers/InputDefaultValue.php';
         </form>
     </div>
 
+    <!-- Модальное окно для списка обращений -->
+    <div class="modal micromodal-slide" id="my-tickets-modal" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="modal__container" role="dialog" aria-modal="true">
+                <header class="modal__header">
+                    <h2 class="modal__title">Мои обращения</h2>
+                    <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+                </header>
+                <main class="modal__content">
+                    <div class="tickets-list">
+                        <?php
+                        // Получаем тикеты текущего пользователя
+                        $stmt = $DB->prepare("SELECT t.*, u.name as admin_name 
+                                            FROM tickets t 
+                                            LEFT JOIN users u ON t.admin = u.id 
+                                            WHERE t.clients = (SELECT id FROM users WHERE token = ?)
+                                            ORDER BY t.created_at DESC");
+                        $stmt->execute([$_SESSION['token']]);
+                        $tickets = $stmt->fetchAll();
+
+                        foreach ($tickets as $ticket) {
+                            $statusClass = $ticket['status'] === 'waiting' ? 'status-waiting' : 
+                                         ($ticket['status'] === 'in_progress' ? 'status-progress' : 'status-done');
+                            $statusText = $ticket['status'] === 'waiting' ? 'Ожидает' : 
+                                        ($ticket['status'] === 'in_progress' ? 'В работе' : 'Завершено');
+                            ?>
+                            <div class="ticket-card">
+                                <div class="ticket-header">
+                                    <span class="ticket-type"><?php echo htmlspecialchars($ticket['type']); ?></span>
+                                    <span class="ticket-status <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                                </div>
+                                <div class="ticket-body">
+                                    <p class="ticket-message"><?php echo htmlspecialchars($ticket['message']); ?></p>
+                                    <div class="ticket-info">
+                                        <span class="ticket-date"><?php echo date('d.m.Y H:i', strtotime($ticket['created_at'])); ?></span>
+                                        <?php if ($ticket['admin_name']): ?>
+                                            <span class="ticket-admin">Техподдержка: <?php echo htmlspecialchars($ticket['admin_name']); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if ($ticket['file_path']): ?>
+                                        <div class="ticket-attachment">
+                                            <i class="fa fa-paperclip"></i>
+                                            <a href="<?php echo htmlspecialchars($ticket['file_path']); ?>" target="_blank">Прикрепленный файл</a>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="ticket-actions">
+                                    <button type="button" class="chat-btn" onclick="openChat(<?php echo $ticket['id']; ?>)">
+                                        <i class="fa fa-comments"></i> Открыть чат
+                                    </button>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для чата -->
+    <div class="modal micromodal-slide" id="chat-modal" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="modal__container" role="dialog" aria-modal="true">
+                <header class="modal__header">
+                    <h2 class="modal__title">Чат с технической поддержкой</h2>
+                    <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+                </header>
+                <main class="modal__content">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Сообщения будут добавляться здесь -->
+                        </div>
+                        <form id="chat-form" class="chat-form">
+                            <input type="hidden" id="ticket-id" name="ticket_id" value="">
+                            <textarea name="message" id="chat-message" placeholder="Введите сообщение..."></textarea>
+                            <button type="submit">
+                                <i class="fa fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const supportBtn = document.querySelector('.support-btn');
@@ -450,7 +543,257 @@ require_once 'api/helpers/InputDefaultValue.php';
         supportBtn.addEventListener('click', function() {
             supportForm.classList.toggle('active');
         });
+
+        // Функция для закрытия формы тикета
+        window.closeTicketForm = function() {
+            supportForm.classList.remove('active');
+        };
+
+        // Функция для открытия чата
+        window.openChat = function(ticketId) {
+            document.getElementById('ticket-id').value = ticketId;
+            loadChatMessages(ticketId);
+            MicroModal.show('chat-modal');
+        };
+
+        // Загрузка сообщений чата
+        function loadChatMessages(ticketId) {
+            fetch(`api/tickets/GetMessages.php?ticket_id=${ticketId}`)
+                .then(response => response.json())
+                .then(messages => {
+                    const chatMessages = document.getElementById('chat-messages');
+                    chatMessages.innerHTML = '';
+                    messages.forEach(message => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `chat-message ${message.is_admin ? 'admin' : 'user'}`;
+                        messageDiv.innerHTML = `
+                            <div class="message-content">
+                                <p>${message.message}</p>
+                                <span class="message-time">${message.created_at}</span>
+                            </div>
+                        `;
+                        chatMessages.appendChild(messageDiv);
+                    });
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+        }
+
+        // Отправка сообщения
+        document.getElementById('chat-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const ticketId = document.getElementById('ticket-id').value;
+            const message = document.getElementById('chat-message').value;
+            
+            if (!message.trim()) return; // Не отправляем пустые сообщения
+
+            fetch('api/tickets/SendMessage.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ticket_id: ticketId,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    document.getElementById('chat-message').value = '';
+                    loadChatMessages(ticketId);
+                } else {
+                    alert(result.error || 'Ошибка при отправке сообщения');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при отправке сообщения');
+            });
+        });
+
+        // Закрытие модальных окон по крестику
+        document.querySelectorAll('.modal__close').forEach(button => {
+            button.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                if (modal) {
+                    MicroModal.close(modal.id);
+                }
+            });
+        });
     });
     </script>
+
+    <style>
+    .support-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        padding: 5px;
+        font-size: 1.2em;
+    }
+
+    .close-btn:hover {
+        color: #333;
+    }
+
+    .tickets-list {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .ticket-card {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .ticket-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .ticket-type {
+        font-weight: bold;
+    }
+
+    .ticket-status {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+
+    .status-waiting { background: #fff3cd; color: #856404; }
+    .status-progress { background: #cce5ff; color: #004085; }
+    .status-done { background: #d4edda; color: #155724; }
+
+    .ticket-body {
+        margin-bottom: 15px;
+    }
+
+    .ticket-message {
+        margin-bottom: 10px;
+    }
+
+    .ticket-info {
+        font-size: 0.9em;
+        color: #666;
+    }
+
+    .ticket-date {
+        margin-right: 15px;
+    }
+
+    .ticket-attachment {
+        margin-top: 10px;
+    }
+
+    .ticket-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .chat-btn {
+        background: rgb(154, 197, 165);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .chat-btn:hover {
+        background: rgb(134, 177, 145);
+    }
+
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 60vh;
+    }
+
+    .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .chat-message {
+        margin-bottom: 10px;
+        display: flex;
+    }
+
+    .chat-message.user {
+        justify-content: flex-end;
+    }
+
+    .message-content {
+        max-width: 70%;
+        padding: 10px;
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .chat-message.user .message-content {
+        background: rgb(154, 197, 165);
+        color: white;
+    }
+
+    .chat-message.admin .message-content {
+        background: #e9ecef;
+    }
+
+    .message-time {
+        font-size: 0.8em;
+        color: #666;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .chat-form {
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-form textarea {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: none;
+        height: 60px;
+    }
+
+    .chat-form button {
+        background: rgb(154, 197, 165);
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .chat-form button:hover {
+        background: rgb(134, 177, 145);
+    }
+    </style>
 </body>
 </html>

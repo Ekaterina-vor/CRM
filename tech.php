@@ -200,7 +200,7 @@ if ($userType !== 'tech') {
                                 <i class='fa fa-calendar'></i> 
                                 " . date('d.m.Y H:i', strtotime($ticket['created_at'])) . "
                             </div>
-                            <button class='reply-btn' onclick='showReplyModal(" . $ticket['id'] . ", " . $ticket['clients'] . ")'><i class='fa fa-reply'></i> Ответить</button>
+                            <button class='chat-btn' onclick='openChat(" . $ticket['id'] . ")'><i class='fa fa-comments'></i> Открыть чат</button>
                         </div>";
                     }
                 ?>
@@ -278,6 +278,126 @@ if ($userType !== 'tech') {
         </div>
     </div>
 
+    <!-- Добавляем модальное окно для чата -->
+    <div class="modal micromodal-slide" id="chat-modal" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="modal__container" role="dialog" aria-modal="true">
+                <header class="modal__header">
+                    <h2 class="modal__title">Чат с клиентом</h2>
+                    <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+                </header>
+                <main class="modal__content">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Сообщения будут добавляться здесь -->
+                        </div>
+                        <form id="chat-form" class="chat-form">
+                            <input type="hidden" id="ticket-id" name="ticket_id" value="">
+                            <textarea name="message" id="chat-message" placeholder="Введите сообщение..."></textarea>
+                            <button type="submit">
+                                <i class="fa fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 60vh;
+    }
+
+    .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .chat-message {
+        margin-bottom: 10px;
+        display: flex;
+    }
+
+    .chat-message.user {
+        justify-content: flex-end;
+    }
+
+    .message-content {
+        max-width: 70%;
+        padding: 10px;
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .chat-message.user .message-content {
+        background: #e9ecef;
+    }
+
+    .chat-message.admin .message-content {
+        background: rgb(154, 197, 165);
+        color: white;
+    }
+
+    .message-time {
+        font-size: 0.8em;
+        color: #666;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .chat-form {
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-form textarea {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: none;
+        height: 60px;
+    }
+
+    .chat-form button {
+        background: rgb(154, 197, 165);
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .chat-form button:hover {
+        background: rgb(134, 177, 145);
+    }
+
+    .chat-btn {
+        background: rgb(154, 197, 165);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 10px;
+    }
+
+    .chat-btn:hover {
+        background: rgb(134, 177, 145);
+    }
+    </style>
+
     <script defer src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -289,6 +409,71 @@ if ($userType !== 'tech') {
                 disableScroll: true,
                 awaitOpenAnimation: true,
                 awaitCloseAnimation: true
+            });
+
+            // Функция для открытия чата
+            window.openChat = function(ticketId) {
+                document.getElementById('ticket-id').value = ticketId;
+                loadChatMessages(ticketId);
+                MicroModal.show('chat-modal');
+            };
+
+            // Загрузка сообщений чата
+            function loadChatMessages(ticketId) {
+                fetch(`api/tickets/GetMessages.php?ticket_id=${ticketId}`)
+                    .then(response => response.json())
+                    .then(messages => {
+                        const chatMessages = document.getElementById('chat-messages');
+                        chatMessages.innerHTML = '';
+                        messages.forEach(message => {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = `chat-message ${message.is_admin ? 'admin' : 'user'}`;
+                            messageDiv.innerHTML = `
+                                <div class="message-content">
+                                    <p>${message.message}</p>
+                                    <span class="message-time">${message.created_at}</span>
+                                </div>
+                            `;
+                            chatMessages.appendChild(messageDiv);
+                        });
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    })
+                    .catch(error => {
+                        console.error('Ошибка загрузки сообщений:', error);
+                    });
+            }
+
+            // Отправка сообщения
+            document.getElementById('chat-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const ticketId = document.getElementById('ticket-id').value;
+                const message = document.getElementById('chat-message').value;
+                
+                if (!message.trim()) return;
+
+                fetch('api/tickets/SendMessage.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ticket_id: ticketId,
+                        message: message
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        document.getElementById('chat-message').value = '';
+                        loadChatMessages(ticketId);
+                    } else {
+                        alert(result.error || 'Ошибка при отправке сообщения');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при отправке сообщения');
+                });
             });
 
             // Обработчик изменения статуса
