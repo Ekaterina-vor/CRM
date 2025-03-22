@@ -189,6 +189,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .modal__form-group label {
@@ -197,15 +198,18 @@
     font-weight: 500;
 }
 
-.modal__form-group input {
+.modal__form-group input,
+.modal__form-group select {
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
     transition: border-color 0.2s;
+    width: 100%;
 }
 
-.modal__form-group input:focus {
+.modal__form-group input:focus,
+.modal__form-group select:focus {
     outline: none;
     border-color: #4a90e2;
     box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
@@ -243,6 +247,23 @@
 
 .modal__btn-secondary:hover {
     background-color: #545b62;
+}
+
+/* Стили для поля промокода */
+#promo {
+    margin-top: 10px;
+    background-color: #fff;
+}
+
+.modal__form-group input[type="text"]#promo {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    width: 100%;
+}
+
+.modal__form-group input[type="text"]#promo:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
 }
 
 /* Адаптивность */
@@ -610,6 +631,7 @@
         white-space: nowrap;
         font-size: 12px;
     }
+
 }
 
 @media(max-width: 576px) {

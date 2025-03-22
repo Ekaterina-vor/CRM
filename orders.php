@@ -84,6 +84,7 @@ require_once 'api/helpers/InputDefaultValue.php';
                 <li><a href="clients.php">Клиенты</a></li>
                 <li><a href="products.php">Товары</a></li>
                 <li><a href="orders.php">Заказы</a></li>
+                <li><a href="promotions.php">Акции</a></li>
                 <?php
                     require_once 'api/helpers/getUserType.php';
                     $userType = getUserType($DB);
@@ -280,7 +281,7 @@ require_once 'api/helpers/InputDefaultValue.php';
                     <div class="modal__form-group"> 
                         <label for="client">Клиент</label> 
                         <select name="client" id="client" class="main__select">
-                        <option value="new">Новый пользователь</option>
+                            <option value="new">Новый пользователь</option>
                             <?php   
                                 $users = $DB->query("SELECT id, name FROM clients")->fetchAll();
                                 foreach($users as $key => $user) {
@@ -308,10 +309,12 @@ require_once 'api/helpers/InputDefaultValue.php';
                                     echo "<option value='$id'>$name - $price ₽ - $stock шт.</option>";
                                 }
                             ?>
-                            
                         </select> 
                     </div> 
-                    
+                    <div class="modal__form-group">
+                        <label for="promo">Промокод</label>
+                        <input type="text" id="promo" name="promo" class="main__input" placeholder="Введите промокод...">
+                    </div>
                     <div class="modal__form-actions"> 
                         <button type="submit" class="modal__btn modal__btn-primary">Создать</button> 
                         <button type="button" class="modal__btn modal__btn-secondary" data-micromodal-close>Отменить</button> 
@@ -354,7 +357,7 @@ require_once 'api/helpers/InputDefaultValue.php';
     <div class="modal micromodal-slide 
     <?php 
         if(isset($_SESSION['orders-errors']) && !empty($_SESSION['orders-errors'])) {
-            echo 'open';
+            echo 'is-open';
         }
     ?>
     " id="error-modal" aria-hidden="true"> 
@@ -371,6 +374,7 @@ require_once 'api/helpers/InputDefaultValue.php';
                 if(isset($_SESSION['orders-errors'])) {
                     echo $_SESSION['orders-errors'];
                     unset($_SESSION['orders-errors']);
+                   
                 }
             ?>
             </main> 
@@ -622,6 +626,16 @@ require_once 'api/helpers/InputDefaultValue.php';
         });
     });
     </script>
+
+        <!-- Добавляем скрипт для инициализации модального окна с ошибкой -->
+        <script>
+         document.addEventListener('DOMContentLoaded', function() {
+             if (document.querySelector('#error-modal.is-open')) {
+                 MicroModal.init();
+                 MicroModal.show('error-modal');
+             }
+         });
+     </script>
 
     <style>
     .support-buttons {

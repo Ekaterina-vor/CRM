@@ -43,6 +43,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         exit;
     }
 
+    //код акции (code_promo)
+    $promo = $_POST['promo'];
+    $promoInfo = []; // информация о акции
+
+    // 1. получить информацию о акции и записать в promoInfo (по code_promo)
+    // 2. проверить активна ли акция (uses < max_uses, cancel_at < текущей даты)
+
+    $promoInfo = $DB->query(   
+        "SELECT * FROM promotions WHERE code_promo = '$promo'" 
+        )->fetchALL();
+
+    if (empty($promoInfo)) {
+        $_SESSION['orders_error'] = 'Промокод не существует';
+        header('Location: ../../orders.php');
+        exit;
+    }
+
+    if ($promoInfo[0]['uses'] >= $promoInfo[0]['max_uses']) {
+        $_SESSION['orders_error'] = 'Акция закончена';
+        header('Location: ../../orders.php');
+        exit;
+    }
     
     //ид товаров
     $productsIds = $formData['products'];
@@ -56,6 +78,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if(in_array($product['id'], $productsIds)) {
             $total += $product['price'];
         }
+    }
+
+    // Применяем скидку, если промокод действителен
+    if (!empty($promoInfo)) {
+        $discount = $promoInfo[0]['discount'];
+        $total = $total - ($total * ($discount / 100));
+        
+        // Увеличиваем количество использований промокода
+        $promoId = $promoInfo[0]['id'];
+        $DB->query("UPDATE promotions SET uses = uses + 1 WHERE id = $promoId");
     }
 
     $token = $_SESSION['token'];
